@@ -4,6 +4,8 @@ import { Menu, X, MessageCircle, ArrowUpRight, Github, Linkedin, ArrowRight } fr
 import { Button } from "@/components/ui/button";
 import { Brand } from "./shared";
 import { navigation } from "@/data/site";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = useLocation({ select: (location) => location.pathname });
@@ -26,6 +28,7 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="nav-actions">
+          <ThemeToggle />
           <Button asChild variant="ghost" className="login-link">
             <Link to="/login">
               Log in
@@ -69,11 +72,15 @@ export function SiteHeader() {
           <Link to="/login" onClick={() => setOpen(false)}>
             Log in
           </Link>
+          <div className="pt-2">
+            <ThemeToggle />
+          </div>
         </nav>
       )}
     </header>
   );
 }
+
 export function SiteFooter() {
   return (
     <footer className="site-footer">
@@ -120,6 +127,7 @@ export function SiteFooter() {
     </footer>
   );
 }
+
 export function ChatPanel() {
   const [open, setOpen] = useState(false);
   return (
