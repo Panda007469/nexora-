@@ -1,0 +1,4 @@
+{
+  "name": "chrome-devtools",
+  "description": "Chrome DevTools MCP server integration for DOM inspection, network debugging, and performance profiling."
+}
