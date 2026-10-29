@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { InitialsAvatar } from "@/components/layout/InitialsAvatar";
 import { team } from "@/data/site";
@@ -28,13 +29,17 @@ const HERO_SLIDES: HeroSlide[] = [
 
 export function HeroSlider() {
   const [current, setCurrent] = useState(0);
+  const [changeCount, setChangeCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const nextSlide = useCallback(() => {
+    setChangeCount((c) => c + 1);
     setCurrent((prev) => (prev + 1) % HERO_SLIDES.length);
   }, []);
 
   const prevSlide = useCallback(() => {
+    setChangeCount((c) => c + 1);
     setCurrent((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
   }, []);
 
@@ -55,7 +60,7 @@ export function HeroSlider() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Background Slides */}
+      {/* Background Slides - crossfade over 700ms */}
       <div className="absolute inset-0 z-0">
         {HERO_SLIDES.map((slide, index) => {
           const isActive = index === current;
@@ -64,8 +69,9 @@ export function HeroSlider() {
               key={slide.src}
               aria-hidden={!isActive}
               className={cn(
-                "absolute inset-0 transition-opacity duration-1000 ease-in-out",
-                isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none",
+                "absolute inset-0 transition-opacity duration-700 ease-in-out",
+                isActive ? "opacity-100 z-5" : "opacity-0 z-0 pointer-events-none",
+                shouldReduceMotion && "transition-none duration-0",
               )}
             >
               <img
@@ -81,6 +87,18 @@ export function HeroSlider() {
           );
         })}
       </div>
+
+      {/* Diagonal bg-brand-gradient wipe passing across during the change */}
+      {!shouldReduceMotion && changeCount > 0 && (
+        <motion.div
+          key={`wipe-${changeCount}`}
+          initial={{ x: "-125%", skewX: -20 }}
+          animate={{ x: "125%", skewX: -20 }}
+          transition={{ duration: 0.7, ease: "easeInOut" }}
+          className="absolute -inset-y-32 left-0 w-full bg-brand-gradient opacity-80 pointer-events-none z-15 shadow-[0_0_60px_rgba(201,75,208,0.5)]"
+          aria-hidden="true"
+        />
+      )}
 
       {/* Navy overlay for high contrast and brand depth */}
       <div
@@ -180,7 +198,12 @@ export function HeroSlider() {
           <button
             key={i}
             type="button"
-            onClick={() => setCurrent(i)}
+            onClick={() => {
+              if (current !== i) {
+                setChangeCount((c) => c + 1);
+                setCurrent(i);
+              }
+            }}
             aria-label={`Go to slide ${i + 1}`}
             className={cn(
               "h-2 rounded-full transition-all duration-300 cursor-pointer",

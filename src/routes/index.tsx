@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CircuitBoard, Cpu, Code2, GraduationCap } from "lucide-react";
 import { meta } from "@/components/nexora/shared";
+import { FadeUp } from "@/components/layout/FadeUp";
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { AboutSection } from "@/components/home/AboutSection";
 import { ServicesSection } from "@/components/home/ServicesSection";
@@ -21,29 +22,46 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <>
-      <HeroSlider />
-      <div className="trust-strip">
-        <div className="container trust-inner">
-          <span>
-            <CircuitBoard /> Hardware prototyping & circuit design
-          </span>
-          <span>
-            <Cpu /> Microcontrollers & IoT systems
-          </span>
-          <span>
-            <Code2 /> Clean, modern front-end web apps
-          </span>
-          <span>
-            <GraduationCap /> One-on-one student project guidance
-          </span>
+      <FadeUp>
+        <HeroSlider />
+      </FadeUp>
+      <FadeUp>
+        <div className="trust-strip">
+          <div className="container trust-inner">
+            <span>
+              <CircuitBoard /> Hardware prototyping & circuit design
+            </span>
+            <span>
+              <Cpu /> Microcontrollers & IoT systems
+            </span>
+            <span>
+              <Code2 /> Clean, modern front-end web apps
+            </span>
+            <span>
+              <GraduationCap /> One-on-one student project guidance
+            </span>
+          </div>
         </div>
-      </div>
-      <AboutSection />
-      <ServicesSection />
-      <ProjectsSection />
-      <HomeCtaBand />
-      <HowItWorksSection />
-      <FaqPreviewSection />
+      </FadeUp>
+      <FadeUp>
+        <AboutSection />
+      </FadeUp>
+      <FadeUp>
+        <ServicesSection />
+      </FadeUp>
+      <FadeUp>
+        <ProjectsSection />
+      </FadeUp>
+      <FadeUp>
+        <HomeCtaBand />
+      </FadeUp>
+      <FadeUp>
+        <HowItWorksSection />
+      </FadeUp>
+      <FadeUp>
+        <FaqPreviewSection />
+      </FadeUp>
     </>
   );
 }
+

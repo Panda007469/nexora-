@@ -10,6 +10,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import { FadeUp } from "@/components/layout/FadeUp";
 import { projects } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
@@ -84,77 +85,79 @@ export function ProjectsSection() {
           className="w-full relative"
         >
           <CarouselContent className="-ml-4 sm:-ml-6">
-            {carouselProjects.map((project) => (
+            {carouselProjects.map((project, index) => (
               <CarouselItem
                 key={project.id}
                 className="pl-4 sm:pl-6 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
               >
-                {/* Tall Card */}
-                <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl bg-card border border-border shadow-lg aspect-[4/5] select-none">
-                  {/* Background Image */}
-                  <img
-                    src={project.imageSrc}
-                    alt={project.title}
-                    width={1122}
-                    height={1402}
-                    loading="lazy"
-                    className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
+                <FadeUp delay={index * 0.08} className="h-full">
+                  {/* Tall Card */}
+                  <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl bg-card border border-border shadow-lg aspect-[4/5] select-none h-full">
+                    {/* Background Image */}
+                    <img
+                      src={project.imageSrc}
+                      alt={project.title}
+                      width={1122}
+                      height={1402}
+                      loading="lazy"
+                      className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
 
-                  {/* Base Gradient overlay so title & category are crisp */}
-                  <div
-                    className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#001B3D]/95 via-[#001B3D]/60 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0"
-                    aria-hidden="true"
-                  />
+                    {/* Base Gradient overlay so title & category are crisp */}
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#001B3D]/95 via-[#001B3D]/60 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0"
+                      aria-hidden="true"
+                    />
 
-                  {/* Title & Category at the bottom (Default State) */}
-                  <div className="absolute inset-x-0 bottom-0 p-5 md:p-6 transition-all duration-300 group-hover:opacity-0 group-hover:translate-y-4">
-                    <span className="inline-block rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/95 backdrop-blur-md mb-2">
-                      {project.category}
-                    </span>
-                    <h3 className="font-heading font-bold text-lg sm:text-xl text-white tracking-tight leading-snug">
-                      {project.title}
-                    </h3>
-                  </div>
-
-                  {/* Hover State: bg-brand-gradient overlay slides up from bottom */}
-                  <div className="absolute inset-0 bg-brand-gradient/95 p-6 flex flex-col justify-between text-white transition-transform duration-300 ease-out translate-y-full group-hover:translate-y-0">
-                    <div>
-                      <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                    {/* Title & Category at the bottom (Default State) */}
+                    <div className="absolute inset-x-0 bottom-0 p-5 md:p-6 transition-all duration-300 group-hover:opacity-0 group-hover:translate-y-4">
+                      <span className="inline-block rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/95 backdrop-blur-md mb-2">
                         {project.category}
                       </span>
-                    </div>
-
-                    <div>
-                      <h3 className="font-heading font-bold text-xl sm:text-2xl text-white tracking-tight leading-snug mb-3">
+                      <h3 className="font-heading font-bold text-lg sm:text-xl text-white tracking-tight leading-snug">
                         {project.title}
                       </h3>
-                      {project.summary && (
-                        <p className="text-white/90 text-xs sm:text-sm line-clamp-3 mb-5 leading-relaxed">
-                          {project.summary}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between pt-4 border-t border-white/20">
-                        <Link
-                          to="/projects/$slug"
-                          params={{ slug: project.slug }}
-                          className="text-xs font-semibold tracking-wider uppercase font-display text-white hover:underline underline-offset-4"
-                        >
-                          View Case Study
-                        </Link>
-                        {/* Round arrow button linking to project detail page */}
-                        <Link
-                          to="/projects/$slug"
-                          params={{ slug: project.slug }}
-                          aria-label={`View details for ${project.title}`}
-                          className="flex size-12 items-center justify-center rounded-full bg-white text-navy shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
-                        >
-                          <ArrowRight className="size-5" />
-                        </Link>
+                    </div>
+
+                    {/* Hover State: bg-brand-gradient overlay slides up from bottom */}
+                    <div className="absolute inset-0 bg-brand-gradient/95 p-6 flex flex-col justify-between text-white transition-transform duration-300 ease-out translate-y-full group-hover:translate-y-0">
+                      <div>
+                        <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                          {project.category}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="font-heading font-bold text-xl sm:text-2xl text-white tracking-tight leading-snug mb-3">
+                          {project.title}
+                        </h3>
+                        {project.summary && (
+                          <p className="text-white/90 text-xs sm:text-sm line-clamp-3 mb-5 leading-relaxed">
+                            {project.summary}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between pt-4 border-t border-white/20">
+                          <Link
+                            to="/projects/$slug"
+                            params={{ slug: project.slug }}
+                            className="text-xs font-semibold tracking-wider uppercase font-display text-white hover:underline underline-offset-4"
+                          >
+                            View Case Study
+                          </Link>
+                          {/* Round arrow button linking to project detail page */}
+                          <Link
+                            to="/projects/$slug"
+                            params={{ slug: project.slug }}
+                            aria-label={`View details for ${project.title}`}
+                            className="flex size-12 items-center justify-center rounded-full bg-white text-navy shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+                          >
+                            <ArrowRight className="size-5" />
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </FadeUp>
               </CarouselItem>
             ))}
           </CarouselContent>

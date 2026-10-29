@@ -1,4 +1,5 @@
 import { howItWorks } from "@/data/site";
+import { FadeUp } from "@/components/layout/FadeUp";
 
 export function HowItWorksSection() {
   return (
@@ -30,33 +31,34 @@ export function HowItWorksSection() {
             {howItWorks.map((step, index) => {
               const formattedNumber = String(step.step).padStart(2, "0");
               return (
-                <div
-                  key={step.step}
-                  className="relative flex items-start lg:items-center lg:flex-col lg:text-center group"
-                >
-                  {/* Vertical connecting line for mobile (stacked) */}
-                  {index < howItWorks.length - 1 && (
-                    <div
-                      className="lg:hidden absolute left-6 sm:left-7 top-14 -bottom-4 w-[2px] bg-border/80 -translate-x-1/2 z-0"
-                      aria-hidden="true"
-                    />
-                  )}
+                <FadeUp key={step.step} delay={index * 0.08} className="h-full">
+                  <div
+                    className="relative flex items-start lg:items-center lg:flex-col lg:text-center group h-full"
+                  >
+                    {/* Vertical connecting line for mobile (stacked) */}
+                    {index < howItWorks.length - 1 && (
+                      <div
+                        className="lg:hidden absolute left-6 sm:left-7 top-14 -bottom-4 w-[2px] bg-border/80 -translate-x-1/2 z-0"
+                        aria-hidden="true"
+                      />
+                    )}
 
-                  {/* Numbered bg-brand-gradient Circle */}
-                  <div className="relative z-10 flex size-12 sm:size-14 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white font-heading font-bold text-base sm:text-lg shadow-md ring-4 ring-background transition-transform duration-300 group-hover:scale-110">
-                    {formattedNumber}
-                  </div>
+                    {/* Numbered bg-brand-gradient Circle */}
+                    <div className="relative z-10 flex size-12 sm:size-14 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white font-heading font-bold text-base sm:text-lg shadow-md ring-4 ring-background transition-transform duration-300 group-hover:scale-110">
+                      {formattedNumber}
+                    </div>
 
-                  {/* Content: Title & One line of text */}
-                  <div className="ml-4 sm:ml-5 lg:ml-0 lg:mt-5 flex-1">
-                    <h3 className="font-heading font-bold text-base sm:text-lg text-foreground tracking-tight">
-                      {step.title}
-                    </h3>
-                    <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                      {step.description}
-                    </p>
+                    {/* Content: Title & One line of text */}
+                    <div className="ml-4 sm:ml-5 lg:ml-0 lg:mt-5 flex-1">
+                      <h3 className="font-heading font-bold text-base sm:text-lg text-foreground tracking-tight">
+                        {step.title}
+                      </h3>
+                      <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </FadeUp>
               );
             })}
           </div>

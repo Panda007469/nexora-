@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Cpu, CircuitBoard, Check, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { stats } from "@/data/site";
+import { CountUp } from "@/components/layout/CountUp";
 
 export function AboutSection() {
   return (
@@ -62,7 +63,7 @@ export function AboutSection() {
               </div>
               <div>
                 <div className="font-heading text-2xl sm:text-3xl font-bold tracking-tight leading-none">
-                  {stats.projectCount}+
+                  <CountUp value={stats.projectCount} suffix="+" />
                 </div>
                 <div className="text-xs sm:text-sm font-medium text-white/90 mt-1">
                   Completed Projects
