@@ -34,6 +34,7 @@ export const navigation = [
   { name: "Services", to: "/services" },
   { name: "Projects", to: "/projects" },
   { name: "About", to: "/about" },
+  { name: "Contact", to: "/contact" },
 ] as const;
 
 export interface ServiceItem {
@@ -136,48 +137,57 @@ export const howItWorks: HowItWorksStep[] = [
 export interface FAQItem {
   question: string;
   answer: string;
+  topic?: string;
 }
 
 export const faqs: FAQItem[] = [
   {
     question: "How do I submit my project requirements to Nexora?",
+    topic: "Getting Started",
     answer:
       "Fill out our request form with your project domain, abstract, target hardware or software stack, and deadline.",
   },
   {
     question: "What happens during the initial technical review?",
+    topic: "Getting Started",
     answer:
       "Our engineers analyze component requirements, circuit or software architecture, and return actionable feasibility feedback within 24 to 48 hours.",
   },
   {
     question: "Can Nexora assist with both hardware prototypes and software?",
+    topic: "Services & Engineering",
     answer:
       "Yes, we build end-to-end solutions spanning embedded microcontroller firmware, custom PCBs, FPGA logic, and full-stack web applications.",
   },
   {
-    question: "How are project milestones and payments handled?",
-    answer:
-      "Every project is structured into clear phases—from initial schematic/architecture review to prototype demo and final delivery—with milestone-based quotes.",
-  },
-  {
-    question: "What support is provided upon final project delivery?",
-    answer:
-      "You receive complete source code, wiring schematics, setup instructions, and an interactive walkthrough session to ensure complete understanding.",
-  },
-  {
-    question: "Can Nexora assist with university capstone and final-year projects?",
-    answer:
-      "Yes, we mentor students through every stage of capstone execution, including hardware debugging, thesis report structuring, and viva defense preparation.",
-  },
-  {
     question: "What components and microcontrollers do you typically support?",
+    topic: "Services & Engineering",
     answer:
       "We routinely work with ESP32, STM32, Arduino, Raspberry Pi Pico, various sensor modules, wireless transceivers (LoRa, BLE, Zigbee), and Xilinx/Altera FPGAs.",
   },
   {
+    question: "Can Nexora assist with university capstone and final-year projects?",
+    topic: "Services & Engineering",
+    answer:
+      "Yes, we mentor students through every stage of capstone execution, including hardware debugging, thesis report structuring, and viva defense preparation.",
+  },
+  {
+    question: "How are project milestones and payments handled?",
+    topic: "Process & Milestones",
+    answer:
+      "Every project is structured into clear phases—from initial schematic/architecture review to prototype demo and final delivery—with milestone-based quotes.",
+  },
+  {
     question: "How can I track progress during project development?",
+    topic: "Process & Milestones",
     answer:
       "You receive continuous milestone updates, video demos of circuit breadboard testing, and direct chat communication with your assigned student builder.",
+  },
+  {
+    question: "What support is provided upon final project delivery?",
+    topic: "Delivery & Support",
+    answer:
+      "You receive complete source code, wiring schematics, setup instructions, and an interactive walkthrough session to ensure complete understanding.",
   },
 ];
 

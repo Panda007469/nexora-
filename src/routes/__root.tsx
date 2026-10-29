@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import { SiteHeader, SiteFooter, ChatPanel } from "@/components/nexora/shell";
 import { CtaBanner } from "@/components/layout/CtaBanner";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
+import { Toaster } from "@/components/ui/sonner";
 import { LoaderCircle } from "lucide-react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -159,6 +160,7 @@ function RootComponent() {
       <SiteFooter />
       <ChatPanel />
       <ScrollToTop />
+      <Toaster />
     </QueryClientProvider>
   );
 }

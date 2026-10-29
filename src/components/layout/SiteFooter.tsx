@@ -103,6 +103,24 @@ export function SiteFooter() {
               ))}
               <li>
                 <Link
+                  to="/faq"
+                  className="inline-flex items-center gap-1.5 hover:text-white hover:translate-x-1 transition-all"
+                >
+                  <ArrowRight size={12} className="text-royal" />
+                  <span>FAQ</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-1.5 hover:text-white hover:translate-x-1 transition-all"
+                >
+                  <ArrowRight size={12} className="text-royal" />
+                  <span>Contact</span>
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/request"
                   className="inline-flex items-center gap-1.5 hover:text-white hover:translate-x-1 transition-all"
                 >
