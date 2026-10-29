@@ -164,6 +164,21 @@ export const faqs: FAQItem[] = [
     answer:
       "You receive complete source code, wiring schematics, setup instructions, and an interactive walkthrough session to ensure complete understanding.",
   },
+  {
+    question: "Can Nexora assist with university capstone and final-year projects?",
+    answer:
+      "Yes, we mentor students through every stage of capstone execution, including hardware debugging, thesis report structuring, and viva defense preparation.",
+  },
+  {
+    question: "What components and microcontrollers do you typically support?",
+    answer:
+      "We routinely work with ESP32, STM32, Arduino, Raspberry Pi Pico, various sensor modules, wireless transceivers (LoRa, BLE, Zigbee), and Xilinx/Altera FPGAs.",
+  },
+  {
+    question: "How can I track progress during project development?",
+    answer:
+      "You receive continuous milestone updates, video demos of circuit breadboard testing, and direct chat communication with your assigned student builder.",
+  },
 ];
 
 export interface SiteStats {

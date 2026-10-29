@@ -13,6 +13,7 @@ export function InitialsAvatar({
   size = "md",
   className = "",
 }: InitialsAvatarProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
   // Compute initials: first letter of each word (up to 2 letters)
@@ -29,34 +30,26 @@ export function InitialsAvatar({
     lg: "size-24 sm:size-28 text-2xl font-bold ring-[3px]",
   }[size];
 
-  // If photo is provided and has not failed to load, render the photo inside the gradient ring
-  if (photo && !imageError) {
-    return (
-      <div
-        className={`relative inline-flex items-center justify-center rounded-full p-[2px] bg-brand-gradient ${className}`}
-      >
-        <img
-          src={photo}
-          alt={name}
-          onError={() => setImageError(true)}
-          className={`rounded-full object-cover bg-navy ${sizeStyles.split(" ")[0]} ${sizeStyles.split(" ")[1]}`}
-        />
-      </div>
-    );
-  }
-
-  // Circular initials avatar with navy background, white initials, bg-brand-gradient ring
   return (
     <div
       className={`relative inline-flex items-center justify-center rounded-full p-[2px] bg-brand-gradient shrink-0 ${className}`}
     >
       <div
-        className={`flex items-center justify-center rounded-full bg-navy text-white font-heading ${sizeStyles}`}
-        aria-hidden="true"
+        className={`relative flex items-center justify-center rounded-full bg-navy text-white font-heading overflow-hidden ${sizeStyles}`}
       >
         <span>{initials}</span>
+        {photo && !imageError && (
+          <img
+            src={photo}
+            alt={name}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+            className={`absolute inset-0 size-full object-cover transition-opacity duration-200 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        )}
       </div>
     </div>
   );
 }
-
