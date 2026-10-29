@@ -4,6 +4,8 @@ import { Search, ArrowDown, FolderSearch, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { projects, categories } from "@/data/projects";
 import { PageHeading, ProjectCard, meta } from "@/components/nexora/shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+
 export const Route = createFileRoute("/projects/")({
   head: () =>
     meta(
@@ -12,6 +14,7 @@ export const Route = createFileRoute("/projects/")({
     ),
   component: Projects,
 });
+
 function Projects() {
   const [category, setCategory] = useState("All projects");
   const [query, setQuery] = useState("");
@@ -31,72 +34,86 @@ function Projects() {
       `${p.title} ${p.tech.join(" ")} ${p.category}`.toLowerCase().includes(query.toLowerCase()),
   );
   return (
-    <main className="container page-body">
-      <PageHeading
-        eyebrow="THE NEXORA WORKBENCH"
-        title="Built with curiosity."
-        text="Circuits, code, and a little creative thinking. Explore our sample projects and find inspiration for your own."
+    <>
+      <PageHeader
+        title="Our Projects"
+        breadcrumb={[{ label: "Projects" }]}
       />
-      <div className="project-controls">
-        <div className="filter-tabs" role="tablist" aria-label="Project category">
-          {categories.map((item) => (
-            <Button
-              role="tab"
-              aria-selected={category === item}
-              key={item}
-              variant={category === item ? "default" : "ghost"}
-              onClick={() => {
-                setCategory(item);
+      <main className="container page-body">
+        <PageHeading
+          eyebrow="THE NEXORA WORKBENCH"
+          title="Built with curiosity."
+          text="Circuits, code, and a little creative thinking. Explore our sample projects and find inspiration for your own."
+        />
+        <div className="project-controls">
+          <div className="filter-tabs" role="tablist" aria-label="Project category">
+            {categories.map((item) => (
+              <Button
+                role="tab"
+                aria-selected={category === item}
+                key={item}
+                variant={category === item ? "default" : "ghost"}
+                onClick={() => {
+                  setCategory(item);
+                  setLimit(6);
+                }}
+              >
+                {item}
+              </Button>
+            ))}
+          </div>
+          <div className="search-field">
+            <Search size={16} />
+            <input
+              type="search"
+              placeholder="Search projects..."
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
                 setLimit(6);
               }}
-            >
-              {item}
-            </Button>
+              aria-label="Search projects by title, tech, or category"
+            />
+          </div>
+        </div>
+        <p className="results-label">
+          Showing {Math.min(filtered.length, limit)} of {filtered.length} projects
+        </p>
+        <div className="projects-grid">
+          {filtered.slice(0, limit).map((project) => (
+            <ProjectCard key={project.id} project={project} />
           ))}
+          {filtered.length === 0 && (
+            <div className="empty-state">
+              <FolderSearch size={40} />
+              <h3>No projects match your search</h3>
+              <p>Try searching for a different keyword or category.</p>
+            </div>
+          )}
         </div>
-        <div className="search-field">
-          <Search size={17} />
-          <input
-            aria-label="Search projects"
-            placeholder="Search projects or technologies…"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setLimit(6);
-            }}
-          />
-        </div>
-      </div>
-      <p className="results-label">{filtered.length} projects · Sample portfolio</p>
-      <div className="projects-grid">
-        {filtered.slice(0, limit).map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
-        {filtered.length === 0 && (
-          <div className="empty-state">
-            <FolderSearch size={35} />
-            <h3>No projects found.</h3>
-            <p>Try a different search or category.</p>
+        {filtered.length > limit && (
+          <div className="load-more">
             <Button
-              variant="link"
-              onClick={() => {
-                setQuery("");
-                setCategory("All projects");
-              }}
+              variant="outline"
+              onClick={() => setLoading(true)}
+              disabled={loading}
+              aria-busy={loading}
             >
-              Clear filters
+              {loading ? (
+                <>
+                  <LoaderCircle className="animate-spin" size={16} />
+                  Loading projects...
+                </>
+              ) : (
+                <>
+                  Load more projects
+                  <ArrowDown size={16} />
+                </>
+              )}
             </Button>
           </div>
         )}
-      </div>
-      {limit < filtered.length && (
-        <div className="load-more">
-          <Button variant="outline" size="lg" disabled={loading} onClick={() => setLoading(true)}>
-            {loading ? <LoaderCircle className="animate-spin" /> : <ArrowDown />}
-            {loading ? "Loading projects…" : "Load more"}
-          </Button>
-        </div>
-      )}
-    </main>
+      </main>
+    </>
   );
 }

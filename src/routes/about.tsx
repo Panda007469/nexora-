@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Github, Linkedin } from "lucide-react";
 import { team, images } from "@/data/site";
-import { PageHeading, CtaBand, meta } from "@/components/nexora/shared";
+import { PageHeading, meta } from "@/components/nexora/shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+
 export const Route = createFileRoute("/about")({
   head: () =>
     meta(
@@ -10,9 +12,14 @@ export const Route = createFileRoute("/about")({
     ),
   component: About,
 });
+
 function About() {
   return (
     <>
+      <PageHeader
+        title="About Us"
+        breadcrumb={[{ label: "About" }]}
+      />
       <main className="container page-body">
         <PageHeading
           eyebrow="THREE MINDS. ONE NEXORA."
@@ -65,7 +72,6 @@ function About() {
           ))}
         </div>
       </main>
-      <CtaBand />
     </>
   );
 }

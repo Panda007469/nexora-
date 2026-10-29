@@ -11,6 +11,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { SiteHeader, SiteFooter, ChatPanel } from "@/components/nexora/shell";
+import { CtaBanner } from "@/components/layout/CtaBanner";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { LoaderCircle } from "lucide-react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -153,8 +155,10 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <SiteHeader />
       <Outlet />
+      <CtaBanner />
       <SiteFooter />
       <ChatPanel />
+      <ScrollToTop />
     </QueryClientProvider>
   );
 }

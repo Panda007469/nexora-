@@ -8,9 +8,9 @@ import {
   ServiceCard,
   ProjectCard,
   TextLink,
-  CtaBand,
   meta,
 } from "@/components/nexora/shared";
+
 export const Route = createFileRoute("/")({
   head: () =>
     meta(
@@ -19,6 +19,7 @@ export const Route = createFileRoute("/")({
     ),
   component: Home,
 });
+
 function Home() {
   return (
     <>
@@ -32,76 +33,75 @@ function Home() {
         />
         <div className="container hero-content">
           <span className="availability">
-            <span className="small-dot" />
-            STUDENT-LED. BUILT WITH PURPOSE.
+            <span className="small-dot" /> AVAILABLE FOR STUDENT PROJECTS
           </span>
           <h1>
-            Nexora<span>.</span>
-          </h1>
-          <h2>
-            Your ideas. Our expertise.
+            Student ideas.
             <br />
-            Something extraordinary.
-          </h2>
+            <span>Real-world</span> projects.
+          </h1>
+          <h2>Hardware, embedded systems, and front-end builds.</h2>
           <p>
-            From circuits to code, we turn ambitious ideas into real-world projects. A team of three
-            students, here to help you build, learn, and move forward.
+            You bring the curiosity and the concept. Nexora provides the technical hands-on support
+            to build, refine, and bring it to life.
           </p>
           <div className="hero-actions">
-            <RequestLink />
-            <Button asChild variant="outline" size="lg">
-              <Link to="/projects">
-                Explore projects
-                <ArrowRight />
-              </Link>
+            <RequestLink>
+              Start your project
+            </RequestLink>
+            <Button asChild variant="outline">
+              <Link to="/projects">Explore our work</Link>
             </Button>
           </div>
           <div className="hero-proof">
             <div className="mini-avatars">
-              {[0, 1, 2].map((i) => (
-                <span key={i}>
-                  <img
-                    src={images.team}
-                    alt="Illustrative team portrait"
-                    width={1536}
-                    height={512}
-                  />
-                </span>
-              ))}
+              <span>
+                <img
+                  src={images.team}
+                  alt="Portrait photo of Arjun Kumar, Hardware and Embedded lead"
+                />
+              </span>
+              <span>
+                <img
+                  src={images.team}
+                  alt="Portrait photo of Priya Sharma, Front-end developer"
+                />
+              </span>
+              <span>
+                <img
+                  src={images.team}
+                  alt="Portrait photo of Rahul Verma, Embedded developer"
+                />
+              </span>
             </div>
             <span>
-              <strong>3 curious minds.</strong> One shared passion for building.
+              Built by students, for students. <strong>Available this semester.</strong>
             </span>
           </div>
         </div>
       </section>
       <div className="trust-strip">
         <div className="container trust-inner">
-          <span className="trust-label">IDEAS WITHOUT LIMITS</span>
           <span>
-            <CircuitBoard />
-            Hardware & Prototyping
+            <CircuitBoard /> Hardware prototyping & circuit design
           </span>
           <span>
-            <Cpu />
-            Embedded & IoT
+            <Cpu /> Microcontrollers & IoT systems
           </span>
           <span>
-            <Code2 />
-            Front-End Development
+            <Code2 /> Clean, modern front-end web apps
           </span>
           <span>
-            <GraduationCap />
-            Student to Student
+            <GraduationCap /> One-on-one student project guidance
           </span>
         </div>
       </div>
-      <section className="section container">
+      <section className="container section">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">WHAT WE DO</span>
-            <h2>A little expertise. A lot of possibility.</h2>
-            <p>The right support for whatever you’re building next.</p>
+            <span className="eyebrow">WHAT WE BUILD</span>
+            <h2>Four ways we can help you build.</h2>
+            <p>From circuit boards to websites, we turn ambitious concepts into working reality.</p>
           </div>
           <TextLink to="/services">All services</TextLink>
         </div>
@@ -111,27 +111,27 @@ function Home() {
           ))}
         </div>
       </section>
-      <section className="section featured-section">
+      <section className="featured-section section">
         <div className="container">
           <div className="section-heading">
             <div>
-              <span className="eyebrow">FROM OUR WORKBENCH</span>
-              <h2>Ideas brought to life.</h2>
-              <p>A glimpse into the things we love to build.</p>
+              <span className="eyebrow">RECENT BUILDS</span>
+              <h2>Projects from the workbench.</h2>
+              <p>Sample hardware, embedded devices, and web applications built by Nexora.</p>
             </div>
-            <TextLink to="/projects">View all projects</TextLink>
+            <TextLink to="/projects">All projects</TextLink>
           </div>
           <div className="projects-grid">
             {projects.slice(0, 3).map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard project={project} key={project.id} />
             ))}
           </div>
         </div>
       </section>
-      <section className="section container">
+      <section className="container section">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">HOW IT WORKS</span>
+            <span className="eyebrow">THE PROCESS</span>
             <h2>From “what if” to “here it is.”</h2>
           </div>
           <span className="text-link">Three simple steps.</span>
@@ -146,7 +146,6 @@ function Home() {
           ))}
         </div>
       </section>
-      <CtaBand />
     </>
   );
 }

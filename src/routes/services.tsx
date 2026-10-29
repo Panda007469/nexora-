@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { services } from "@/data/site";
-import { PageHeading, ServiceCard, CtaBand, meta } from "@/components/nexora/shared";
+import { PageHeading, ServiceCard, meta } from "@/components/nexora/shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+
 export const Route = createFileRoute("/services")({
   head: () =>
     meta(
@@ -9,9 +11,14 @@ export const Route = createFileRoute("/services")({
     ),
   component: Services,
 });
+
 function Services() {
   return (
     <>
+      <PageHeader
+        title="Our Services"
+        breadcrumb={[{ label: "Services" }]}
+      />
       <main className="container page-body">
         <PageHeading
           eyebrow="OUR EXPERTISE"
@@ -24,7 +31,6 @@ function Services() {
           ))}
         </div>
       </main>
-      <CtaBand />
     </>
   );
 }
