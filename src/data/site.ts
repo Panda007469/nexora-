@@ -1,10 +1,7 @@
-import hero from "@/assets/nexora-hero.jpg";
-import robot from "@/assets/embedded.jpg";
-import frontend from "@/assets/frontend.jpg";
-import teamImage from "@/assets/team.jpg";
+import { images } from "./images";
 import { projects } from "./projects";
 
-export const images = { hero, robot, frontend, team: teamImage };
+export { images };
 
 export const tagline = "From Ideas To Innovation";
 
@@ -175,8 +172,12 @@ export interface SiteStats {
 }
 
 export const stats: SiteStats = {
-  projectCount: projects.length,
-  serviceAreasCount: services.length,
+  get projectCount() {
+    return projects?.length ?? 12;
+  },
+  get serviceAreasCount() {
+    return services?.length ?? 4;
+  },
 };
 
 export const steps = [
@@ -197,23 +198,30 @@ export const steps = [
   },
 ];
 
-export const team = [
+export interface TeamMember {
+  name: string;
+  role: string;
+  skills: string[];
+  photo?: string;
+}
+
+export const team: TeamMember[] = [
   {
     name: "Arjun Kumar",
     role: "Hardware & Embedded Lead",
     skills: ["Circuit design", "Arduino", "ESP32"],
-    photo: 0,
+    photo: "/images/team/arjun-kumar.webp",
   },
   {
     name: "Priya Sharma",
     role: "Front-End Developer",
     skills: ["React", "TypeScript", "UI/UX"],
-    photo: 1,
+    photo: "/images/team/priya-sharma.webp",
   },
   {
     name: "Rahul Verma",
     role: "Embedded Developer & Student Mentor",
     skills: ["C/C++", "IoT", "Mentoring"],
-    photo: 2,
+    photo: "/images/team/rahul-verma.webp",
   },
 ];

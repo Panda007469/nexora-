@@ -686,10 +686,10 @@
 }
 .chat-toggle {
   position: fixed;
-  right: 25px;
-  bottom: 24px;
-  width: 50px !important;
-  height: 50px !important;
+  right: 1rem;
+  bottom: 1rem;
+  width: 48px !important;
+  height: 48px !important;
   border-radius: 50% !important;
   box-shadow: var(--shadow-panel);
   z-index: 60;
@@ -710,8 +710,8 @@
 }
 .chat-panel {
   position: fixed;
-  right: 25px;
-  bottom: 87px;
+  right: 1rem;
+  bottom: 4.5rem;
   width: min(350px, calc(100% - 32px));
   height: 370px;
   background: var(--card);
@@ -773,7 +773,7 @@
 }
 .page-body {
   min-height: 65vh;
-  padding-bottom: 75px;
+  padding-bottom: 6rem;
 }
 .service-page-grid {
   display: grid;
@@ -1311,14 +1311,14 @@
     font-size: 8px;
   }
   .chat-toggle {
-    right: 17px;
-    bottom: 17px;
-    width: 46px !important;
-    height: 46px !important;
+    right: 1rem;
+    bottom: 1rem;
+    width: 48px !important;
+    height: 48px !important;
   }
   .chat-panel {
-    right: 16px;
-    bottom: 77px;
+    right: 1rem;
+    bottom: 4.5rem;
   }
   .page-heading {
     padding: 43px 0 30px;
@@ -1382,7 +1382,7 @@
     grid-template-columns: 1fr;
   }
   .page-body {
-    padding-bottom: 45px;
+    padding-bottom: 6rem;
   }
 }
 .password-field {

@@ -1,4 +1,4 @@
-import { images } from "./site";
+import { images } from "./images";
 export const categories = ["All projects", "Hardware", "Embedded Systems", "Front-End"] as const;
 export const projects = [
   {

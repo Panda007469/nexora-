@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CircuitBoard, Cpu, Code2, GraduationCap } from "lucide-react";
+import { CircuitBoard, Cpu, Code2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { images, services, steps } from "@/data/site";
+import { images, services, steps, team } from "@/data/site";
 import { projects } from "@/data/projects";
 import {
   RequestLink,
@@ -10,6 +10,7 @@ import {
   TextLink,
   meta,
 } from "@/components/nexora/shared";
+import { InitialsAvatar } from "@/components/layout/InitialsAvatar";
 
 export const Route = createFileRoute("/")({
   head: () =>
@@ -54,25 +55,16 @@ function Home() {
             </Button>
           </div>
           <div className="hero-proof">
-            <div className="mini-avatars">
-              <span>
-                <img
-                  src={images.team}
-                  alt="Portrait photo of Arjun Kumar, Hardware and Embedded lead"
+            <div className="flex items-center -space-x-2">
+              {team.map((member) => (
+                <InitialsAvatar
+                  key={member.name}
+                  name={member.name}
+                  photo={member.photo}
+                  size="sm"
+                  className="shadow-sm"
                 />
-              </span>
-              <span>
-                <img
-                  src={images.team}
-                  alt="Portrait photo of Priya Sharma, Front-end developer"
-                />
-              </span>
-              <span>
-                <img
-                  src={images.team}
-                  alt="Portrait photo of Rahul Verma, Embedded developer"
-                />
-              </span>
+              ))}
             </div>
             <span>
               Built by students, for students. <strong>Available this semester.</strong>
