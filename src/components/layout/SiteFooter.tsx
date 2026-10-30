@@ -128,6 +128,15 @@ export function SiteFooter() {
                   <span>Request a Service</span>
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-1.5 hover:text-white hover:translate-x-1 transition-all"
+                >
+                  <ArrowRight size={12} className="text-royal" />
+                  <span>Login</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
