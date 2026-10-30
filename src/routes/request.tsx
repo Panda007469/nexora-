@@ -20,6 +20,7 @@ import {
   FileText,
   Clock,
   Copy,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { services, steps } from "@/data/site";
@@ -29,6 +30,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FadeUp } from "@/components/layout/FadeUp";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { normalizeWhatsApp } from "@/lib/whatsapp";
 import { toast } from "sonner";
 
 const iconMap = {
@@ -62,6 +64,7 @@ const step1Schema = z.object({
   name: requestSchema.shape.name,
   college: requestSchema.shape.college,
   email: requestSchema.shape.email,
+  phone: requestSchema.shape.phone,
 });
 
 const step2Schema = z.object({
@@ -76,6 +79,7 @@ const step3Schema = z.object({
 function mapToRpcPayload(v: {
   name: string;
   email: string;
+  phone: string;
   college: string;
   service: string;
   description: string;
@@ -84,7 +88,7 @@ function mapToRpcPayload(v: {
   return {
     name: v.name,
     email: v.email,
-    phone: "",
+    phone: normalizeWhatsApp(v.phone) ?? v.phone,
     org: v.college,
     city: "",
     customer_type: "student",
@@ -105,6 +109,7 @@ function Request() {
     name: "",
     college: "",
     email: "",
+    phone: "",
     service: search.service ?? "",
     description: "",
     deadline: "",
@@ -132,6 +137,7 @@ function Request() {
         name: values.name,
         college: values.college,
         email: values.email,
+        phone: values.phone,
       });
       if (!result.success) {
         const nextErrors: Record<string, string> = {};
@@ -188,7 +194,7 @@ function Request() {
       setErrors(next);
 
       // Return to first step with an error
-      if (next.name || next.college || next.email) {
+      if (next.name || next.college || next.email || next.phone) {
         setCurrentStep(0);
       } else if (next.service || next.deadline) {
         setCurrentStep(1);
@@ -397,6 +403,7 @@ function Request() {
                           name: "",
                           college: "",
                           email: "",
+                          phone: "",
                           service: "",
                           description: "",
                           deadline: "",
@@ -519,6 +526,44 @@ function Request() {
                           {errors.email && (
                             <p id="email-error" className="text-xs text-destructive mt-1.5 font-medium">
                               {errors.email}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* WhatsApp Phone */}
+                        <div>
+                          <label
+                            htmlFor="phone"
+                            className="block text-xs font-bold font-display uppercase tracking-wider text-foreground mb-2"
+                          >
+                            WhatsApp number <span className="text-magenta">*</span>
+                          </label>
+                          <div className="relative">
+                            <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                            <input
+                              id="phone"
+                              type="tel"
+                              inputMode="tel"
+                              autoComplete="tel"
+                              value={values.phone}
+                              placeholder="+91 98765 43210"
+                              onChange={(e) => update("phone", e.target.value)}
+                              aria-invalid={!!errors.phone}
+                              aria-describedby={errors.phone ? "phone-error" : "phone-desc"}
+                              className={cn(
+                                "w-full h-11 rounded-xl pl-10 pr-4 text-sm bg-background border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all",
+                                errors.phone
+                                  ? "border-destructive focus:ring-destructive/30"
+                                  : "border-border focus:border-royal focus:ring-royal/30",
+                              )}
+                            />
+                          </div>
+                          <p id="phone-desc" className="text-[11px] text-muted-foreground mt-1">
+                            We'll contact you on this number via WhatsApp.
+                          </p>
+                          {errors.phone && (
+                            <p id="phone-error" className="text-xs text-destructive mt-1.5 font-medium">
+                              {errors.phone}
                             </p>
                           )}
                         </div>
@@ -695,7 +740,7 @@ function Request() {
                               <Edit2 className="size-3 mr-1" /> Edit
                             </Button>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                             <div>
                               <span className="text-muted-foreground block">Full Name:</span>
                               <strong className="text-foreground text-sm">{values.name || "—"}</strong>
@@ -707,6 +752,10 @@ function Request() {
                             <div>
                               <span className="text-muted-foreground block">Email:</span>
                               <strong className="text-foreground text-sm">{values.email || "—"}</strong>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground block">WhatsApp:</span>
+                              <strong className="text-foreground text-sm">{values.phone || "—"}</strong>
                             </div>
                           </div>
                         </div>

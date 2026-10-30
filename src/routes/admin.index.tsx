@@ -12,8 +12,10 @@ import {
   Mail,
   Cpu,
   Calendar,
+  MessageCircle,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { meta } from "@/components/nexora/shared";
 import { cn } from "@/lib/utils";
@@ -34,6 +36,7 @@ interface RequestRow {
   name?: string | null;
   student_name?: string | null;
   email?: string | null;
+  phone?: string | null;
   service?: string | null;
   service_type?: string | null;
   status?: string | null;
@@ -265,6 +268,9 @@ function AdminDashboard() {
                       Email
                     </th>
                     <th scope="col" className="py-3.5 px-4 font-bold">
+                      Phone
+                    </th>
+                    <th scope="col" className="py-3.5 px-4 font-bold">
                       Service
                     </th>
                     <th scope="col" className="py-3.5 px-4 font-bold">
@@ -295,6 +301,29 @@ function AdminDashboard() {
                         </td>
                         <td className="py-3.5 px-4 text-muted-foreground">
                           {email}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          {(() => {
+                            const wa = row.phone
+                              ? whatsappUrl(
+                                  row.phone,
+                                  `Hi ${name}, this is Nexora Technologies about your request ${code}.`,
+                                )
+                              : null;
+                            return wa ? (
+                              <a
+                                href={wa}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-md bg-[#25D366] px-2.5 py-1 text-xs font-medium text-white hover:opacity-90 transition-opacity"
+                              >
+                                <MessageCircle className="size-3.5" />
+                                WhatsApp
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            );
+                          })()}
                         </td>
                         <td className="py-3.5 px-4 capitalize text-foreground">
                           {service}

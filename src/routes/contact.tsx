@@ -3,9 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Clock, MapPin, Send, CheckCircle2, LoaderCircle, MessageSquare } from "lucide-react";
+import { Mail, Clock, MapPin, Send, CheckCircle2, LoaderCircle, MessageSquare, Phone, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
-import { contact } from "@/data/site";
+import { contact, phoneDisplay, whatsappNumber } from "@/data/site";
+import { whatsappUrl, normalizeWhatsApp } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FadeUp } from "@/components/layout/FadeUp";
@@ -14,6 +15,10 @@ import { meta } from "@/components/nexora/shared";
 const contactFormSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name (at least 2 characters)."),
   email: z.string().trim().email("Please enter a valid email address."),
+  phone: z
+    .string()
+    .trim()
+    .refine((v) => normalizeWhatsApp(v) !== null, { message: "Enter a valid WhatsApp number" }),
   message: z.string().trim().min(10, "Please enter a message with at least 10 characters."),
 });
 
@@ -42,6 +47,7 @@ function ContactPage() {
     defaultValues: {
       name: "",
       email: "",
+      phone: "",
       message: "",
     },
   });
@@ -106,6 +112,40 @@ function ContactPage() {
                     <p className="text-xs text-muted-foreground mt-1">
                       Drop us your problem statement anytime. We reply within 24 hours.
                     </p>
+                  </div>
+                </div>
+              </div>
+            </FadeUp>
+
+            <FadeUp delay={0.08}>
+              <div className="rounded-3xl border border-border bg-card p-6 sm:p-7 shadow-xs hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/20 shadow-2xs">
+                    <Phone className="size-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold font-display uppercase tracking-wider text-muted-foreground">
+                      Phone &amp; WhatsApp
+                    </span>
+                    <h3 className="font-heading font-bold text-base sm:text-lg text-foreground mt-0.5">
+                      <a
+                        href="tel:+916369570661"
+                        className="hover:text-royal transition-colors"
+                      >
+                        {phoneDisplay}
+                      </a>
+                    </h3>
+                    <div className="mt-1.5">
+                      <a
+                        href={whatsappUrl(whatsappNumber) ?? `https://wa.me/${whatsappNumber}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-[#25D366] font-semibold hover:underline"
+                      >
+                        <MessageCircle className="size-3.5" />
+                        <span>Chat on WhatsApp</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -243,6 +283,40 @@ function ContactPage() {
                       {errors.email && (
                         <p id="email-error" className="text-xs text-destructive mt-1.5 font-medium">
                           {errors.email.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* WhatsApp Phone Field */}
+                    <div>
+                      <label
+                        htmlFor="contact-phone"
+                        className="block text-xs font-bold font-display uppercase tracking-wider text-foreground mb-2"
+                      >
+                        WhatsApp number <span className="text-magenta">*</span>
+                      </label>
+                      <input
+                        id="contact-phone"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        placeholder="+91 98765 43210"
+                        disabled={isSubmitting}
+                        {...register("phone")}
+                        className={`w-full h-11 rounded-xl px-4 text-sm bg-background border ${
+                          errors.phone
+                            ? "border-destructive focus:ring-destructive/30"
+                            : "border-border focus:border-royal focus:ring-royal/30"
+                        } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all`}
+                        aria-invalid={!!errors.phone}
+                        aria-describedby={errors.phone ? "contact-phone-error" : "contact-phone-desc"}
+                      />
+                      <p id="contact-phone-desc" className="text-[11px] text-muted-foreground mt-1">
+                        We'll contact you on this number via WhatsApp.
+                      </p>
+                      {errors.phone && (
+                        <p id="contact-phone-error" className="text-xs text-destructive mt-1.5 font-medium">
+                          {errors.phone.message}
                         </p>
                       )}
                     </div>

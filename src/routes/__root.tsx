@@ -10,9 +10,10 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
-import { SiteHeader, SiteFooter, ChatPanel } from "@/components/nexora/shell";
+import { SiteHeader, SiteFooter } from "@/components/nexora/shell";
 import { CtaBanner } from "@/components/layout/CtaBanner";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { Toaster } from "@/components/ui/sonner";
 import { LoaderCircle } from "lucide-react";
 import appCss from "../styles.css?url";
@@ -158,7 +159,7 @@ function RootComponent() {
       <Outlet />
       <CtaBanner />
       <SiteFooter />
-      <ChatPanel />
+      <WhatsAppButton />
       <ScrollToTop />
       <Toaster />
     </QueryClientProvider>

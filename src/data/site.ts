@@ -5,6 +5,9 @@ export { images };
 
 export const tagline = "From Ideas To Innovation";
 
+export const whatsappNumber = "916369570661";
+export const phoneDisplay = "+91 63695 70661";
+
 export interface ContactInfo {
   email: string;
   workingHours: string;

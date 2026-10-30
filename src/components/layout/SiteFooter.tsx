@@ -10,9 +10,12 @@ import {
   Twitter,
   ArrowRight,
   CheckCircle2,
+  Phone,
+  MessageCircle,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
-import { navigation, contact, socialLinks, services, tagline } from "@/data/site";
+import { navigation, contact, socialLinks, services, tagline, phoneDisplay, whatsappNumber } from "@/data/site";
+import { whatsappUrl } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 
 export function SiteFooter() {
@@ -194,6 +197,26 @@ export function SiteFooter() {
                   className="hover:text-white transition-colors break-all"
                 >
                   {contact.email}
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Phone size={15} className="text-glow shrink-0 mt-0.5" />
+                <a
+                  href="tel:+916369570661"
+                  className="hover:text-white transition-colors"
+                >
+                  {phoneDisplay}
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <MessageCircle size={15} className="text-[#25D366] shrink-0 mt-0.5" />
+                <a
+                  href={whatsappUrl(whatsappNumber) ?? `https://wa.me/${whatsappNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#25D366] hover:underline transition-colors font-medium"
+                >
+                  Chat on WhatsApp
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
