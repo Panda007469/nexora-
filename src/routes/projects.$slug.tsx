@@ -9,7 +9,7 @@ import { FadeUp } from "@/components/layout/FadeUp";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
-    const project = projects.find((p) => p.slug === params.slug);
+    const project = projects.find((p) => p.slug === params.slug && p.published !== false);
     if (!project) throw notFound();
     return project;
   },

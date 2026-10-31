@@ -64,7 +64,7 @@ export function SiteFooter() {
             <Link to="/" aria-label="Nexora home" className="inline-block">
               <Logo
                 variant="full"
-                className="h-10 sm:h-12 w-auto object-contain brightness-0 invert drop-shadow-md"
+                className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
               />
             </Link>
             <p className="text-xs sm:text-sm text-white/70 leading-relaxed mt-2 max-w-xs">
@@ -111,15 +111,6 @@ export function SiteFooter() {
                 >
                   <ArrowRight size={12} className="text-royal" />
                   <span>FAQ</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-1.5 hover:text-white hover:translate-x-1 transition-all"
-                >
-                  <ArrowRight size={12} className="text-royal" />
-                  <span>Contact</span>
                 </Link>
               </li>
               <li>

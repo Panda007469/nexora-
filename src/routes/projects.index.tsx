@@ -34,6 +34,7 @@ function Projects() {
 
   const filtered = projects.filter(
     (p) =>
+      p.published !== false &&
       (category === "All projects" || p.category === category) &&
       `${p.title} ${p.tech.join(" ")} ${p.category}`.toLowerCase().includes(query.toLowerCase()),
   );
@@ -133,9 +134,7 @@ function Projects() {
         {/* Grid of Cards with Hover Gradient Overlay */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {filtered.slice(0, limit).map((project, index) => {
-            // Assign project images 1..6 cyclically
-            const imageSrc =
-              project.image ?? `/images/project-${((Number(project.id) - 1) % 6) + 1}.webp`;
+            const imageSrc = project.image;
 
             return (
               <FadeUp key={project.id} delay={index * 0.05} className="h-full">
@@ -143,9 +142,9 @@ function Projects() {
                   {/* Background Image */}
                   <img
                     src={imageSrc}
-                    alt={project.title}
-                    width={1122}
-                    height={1402}
+                    alt={project.alt ?? project.title}
+                    width={project.width ?? 1672}
+                    height={project.height ?? 941}
                     loading="lazy"
                     className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
                   />

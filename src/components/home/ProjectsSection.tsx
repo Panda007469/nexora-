@@ -19,11 +19,14 @@ export function ProjectsSection() {
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
-  // Take first 6 projects and map them to /images/project-1.webp through project-6.webp
-  const carouselProjects = projects.slice(0, 6).map((project, index) => ({
-    ...project,
-    imageSrc: `/images/project-${index + 1}.webp`,
-  }));
+  // Take published projects for carousel
+  const carouselProjects = projects
+    .filter((project) => project.published !== false)
+    .slice(0, 6)
+    .map((project) => ({
+      ...project,
+      imageSrc: project.image,
+    }));
 
   useEffect(() => {
     if (!api) return;
@@ -96,9 +99,9 @@ export function ProjectsSection() {
                     {/* Background Image */}
                     <img
                       src={project.imageSrc}
-                      alt={project.title}
-                      width={1122}
-                      height={1402}
+                      alt={project.alt ?? project.title}
+                      width={project.width ?? 1672}
+                      height={project.height ?? 941}
                       loading="lazy"
                       className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
                     />
