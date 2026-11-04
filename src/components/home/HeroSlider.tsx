@@ -3,8 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { InitialsAvatar } from "@/components/layout/InitialsAvatar";
-import { team } from "@/data/site";
 import { cn } from "@/lib/utils";
 
 export interface HeroSlide {
@@ -100,13 +98,22 @@ export function HeroSlider() {
         />
       )}
 
-      {/* Navy overlay for high contrast and brand depth */}
+      {/* Navy overlay: ~55% average opacity, darker toward the left for clear photo visibility & text legibility */}
       <div
-        className="absolute inset-0 bg-[#001B3D]/75 md:bg-[#001B3D]/70 z-10 pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-r from-[#001B3D]/75 via-[#001B3D]/55 to-[#001B3D]/35 z-10 pointer-events-none"
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-gradient-to-t from-[#001B3D] via-transparent to-[#001B3D]/50 z-10 pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-t from-[#001B3D]/70 via-transparent to-[#001B3D]/30 z-10 pointer-events-none"
+        aria-hidden="true"
+      />
+
+      {/* Large diagonal bg-brand-gradient shape at 25% opacity on the right side */}
+      <div
+        className="absolute top-0 right-0 bottom-0 w-[48%] md:w-[35%] bg-brand-gradient opacity-25 pointer-events-none z-10"
+        style={{
+          clipPath: "polygon(35% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        }}
         aria-hidden="true"
       />
 
@@ -120,8 +127,8 @@ export function HeroSlider() {
           </span>
         </div>
 
-        {/* Heading */}
-        <h1 className="font-heading font-extrabold text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.1] max-w-4xl text-center mx-auto mb-6 md:mb-8 drop-shadow-sm">
+        {/* Heading: text-6xl to text-7xl on desktop */}
+        <h1 className="font-heading font-extrabold text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.08] max-w-5xl text-center mx-auto mb-6 md:mb-8 drop-shadow-sm">
           From Your Idea to a{" "}
           <span className="text-brand-gradient block sm:inline">
             Working Embedded Prototype
@@ -129,9 +136,8 @@ export function HeroSlider() {
         </h1>
 
         {/* Subtitle description */}
-        <p className="max-w-2xl text-sm sm:text-base md:text-lg text-white/80 font-normal leading-relaxed mb-8 md:mb-10 text-center">
-          You bring the curiosity and the concept. Nexora provides hands-on technical
-          guidance, hardware prototyping, and front-end builds to turn ambitious ideas into reality.
+        <p className="max-w-3xl text-sm sm:text-base md:text-lg lg:text-xl text-white/90 font-normal leading-relaxed mb-8 md:mb-10 text-center">
+          Embedded systems, VLSI and software projects for students, startups and businesses.
         </p>
 
         {/* Action Buttons */}
@@ -151,25 +157,6 @@ export function HeroSlider() {
           >
             <Link to="/projects">Explore Projects</Link>
           </Button>
-        </div>
-
-        {/* Student Proof Avatars */}
-        <div className="mt-8 md:mt-10 flex flex-wrap items-center justify-center gap-3 text-white/80 text-xs sm:text-sm">
-          <div className="flex items-center -space-x-2">
-            {team.map((member) => (
-              <InitialsAvatar
-                key={member.name}
-                name={member.name}
-                photo={member.photo}
-                size="sm"
-                className="shadow-sm ring-2 ring-navy"
-              />
-            ))}
-          </div>
-          <span>
-            Built by students, for students.{" "}
-            <strong className="text-white font-medium">Available this semester.</strong>
-          </span>
         </div>
       </div>
 
@@ -217,4 +204,3 @@ export function HeroSlider() {
     </section>
   );
 }
-

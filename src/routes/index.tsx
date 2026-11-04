@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CircuitBoard, Cpu, Code2, GraduationCap } from "lucide-react";
 import { meta } from "@/components/nexora/shared";
 import { FadeUp } from "@/components/layout/FadeUp";
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { AboutSection } from "@/components/home/AboutSection";
 import { ServicesSection } from "@/components/home/ServicesSection";
+import { StatsBand } from "@/components/home/StatsBand";
 import { ProjectsSection } from "@/components/home/ProjectsSection";
-import { HomeCtaBand } from "@/components/home/HomeCtaBand";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
+import { WhyNexoraSection } from "@/components/home/WhyNexoraSection";
+import { HomeCtaBand } from "@/components/home/HomeCtaBand";
 import { FaqPreviewSection } from "@/components/home/FaqPreviewSection";
 
 export const Route = createFileRoute("/")({
@@ -22,46 +23,50 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <>
+      {/* 1. Hero */}
       <FadeUp>
         <HeroSlider />
       </FadeUp>
-      <FadeUp>
-        <div className="trust-strip">
-          <div className="container trust-inner">
-            <span>
-              <CircuitBoard /> Hardware prototyping & circuit design
-            </span>
-            <span>
-              <Cpu /> Microcontrollers & IoT systems
-            </span>
-            <span>
-              <Code2 /> Clean, modern front-end web apps
-            </span>
-            <span>
-              <GraduationCap /> One-on-one student project guidance
-            </span>
-          </div>
-        </div>
-      </FadeUp>
+
+      {/* 2. About */}
       <FadeUp>
         <AboutSection />
       </FadeUp>
+
+      {/* 3. Services */}
       <FadeUp>
         <ServicesSection />
       </FadeUp>
+
+      {/* 4. Stats band */}
+      <FadeUp>
+        <StatsBand />
+      </FadeUp>
+
+      {/* 5. Projects */}
       <FadeUp>
         <ProjectsSection />
       </FadeUp>
-      <FadeUp>
-        <HomeCtaBand />
-      </FadeUp>
+
+      {/* 6. How It Works */}
       <FadeUp>
         <HowItWorksSection />
       </FadeUp>
+
+      {/* 7. Why Nexora */}
+      <FadeUp>
+        <WhyNexoraSection />
+      </FadeUp>
+
+      {/* 8. CTA band */}
+      <FadeUp>
+        <HomeCtaBand />
+      </FadeUp>
+
+      {/* 9. FAQ preview */}
       <FadeUp>
         <FaqPreviewSection />
       </FadeUp>
     </>
   );
 }
-

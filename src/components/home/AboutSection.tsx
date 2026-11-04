@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Cpu, CircuitBoard, Check, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { stats } from "@/data/site";
+import { projects } from "@/data/projects";
 import { CountUp } from "@/components/layout/CountUp";
 
 export function AboutSection() {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <section className="py-16 md:py-24 bg-background text-foreground overflow-hidden">
       <div className="container">
@@ -17,16 +20,29 @@ export function AboutSection() {
               aria-hidden="true"
             />
 
-            {/* Main Rounded Image */}
-            <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border bg-card shadow-xl">
-              <img
-                src="/images/about.webp"
-                alt="Nexora engineering team prototyping embedded and VLSI solutions"
-                width={1122}
-                height={1402}
-                loading="lazy"
-                className="w-full h-auto max-h-[520px] object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
-              />
+            {/* Main Rounded Image (navy gradient container if missing/error) */}
+            <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border bg-gradient-to-br from-[#001B3D] via-[#001B3D] to-[#2F52BA] shadow-xl min-h-[360px] sm:min-h-[440px] flex items-center justify-center">
+              {!imageError ? (
+                <img
+                  src="/images/about.webp"
+                  alt="Nexora engineering team prototyping embedded and VLSI solutions"
+                  width={1122}
+                  height={1402}
+                  loading="lazy"
+                  onError={() => setImageError(true)}
+                  className="w-full h-auto max-h-[520px] object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+                />
+              ) : (
+                <div className="p-8 text-center text-white flex flex-col items-center justify-center">
+                  <div className="size-16 rounded-2xl bg-white/10 flex items-center justify-center mb-4 text-glow border border-white/15">
+                    <CircuitBoard className="size-8" />
+                  </div>
+                  <h3 className="font-heading font-bold text-xl text-white">Nexora Engineering</h3>
+                  <p className="text-white/70 text-xs mt-2 max-w-xs">
+                    Embedded systems, VLSI logic, and full-stack hardware innovation.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Small round rotating text badge: "Embedded • VLSI • IoT" */}
@@ -56,14 +72,14 @@ export function AboutSection() {
               </div>
             </div>
 
-            {/* Floating bg-brand-gradient stat badge using real stat from site.ts */}
+            {/* Floating bg-brand-gradient stat badge showing number of projects from src/data */}
             <div className="absolute -bottom-5 -left-2 sm:-left-6 rounded-2xl bg-brand-gradient p-4 sm:p-5 text-white shadow-xl flex items-center gap-3.5 sm:gap-4 z-20 border border-white/20">
               <div className="flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur-xs">
                 <CheckCircle2 className="size-6 text-white" />
               </div>
               <div>
                 <div className="font-heading text-2xl sm:text-3xl font-bold tracking-tight leading-none">
-                  <CountUp value={stats.projectCount} suffix="+" />
+                  <CountUp value={projects.length} suffix="+" />
                 </div>
                 <div className="text-xs sm:text-sm font-medium text-white/90 mt-1">
                   Completed Projects
@@ -161,4 +177,3 @@ export function AboutSection() {
     </section>
   );
 }
-
