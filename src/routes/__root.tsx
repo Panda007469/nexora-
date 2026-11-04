@@ -88,14 +88,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Student ideas. Real-world projects. Hardware, embedded systems and front-end development by Nexora.",
+          "From ideas to innovation. Real-world embedded systems, VLSI, and software projects for students, startups, and businesses.",
       },
       { name: "author", content: "Nexora" },
       { property: "og:title", content: "Nexora" },
       {
         property: "og:description",
         content:
-          "Student ideas. Real-world projects. Hardware, embedded systems and front-end development by Nexora.",
+          "From ideas to innovation. Real-world embedded systems, VLSI, and software projects for students, startups, and businesses.",
       },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "/images/og-image.webp" },

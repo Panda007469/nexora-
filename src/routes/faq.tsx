@@ -36,10 +36,7 @@ function FaqPage() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <PageHeader
-        title="Frequently Asked Questions"
-        breadcrumb={[{ label: "FAQ" }]}
-      />
+      <PageHeader title="Frequently Asked Questions" breadcrumb={[{ label: "FAQ" }]} />
 
       <main className="container py-12 md:py-20 max-w-4xl">
         {/* Intro */}
@@ -52,7 +49,8 @@ function FaqPage() {
             Everything You Need to Know
           </h1>
           <p className="mt-3 text-muted-foreground text-sm sm:text-base leading-relaxed">
-            Transparent answers about our engineering methodology, component sourcing, milestone quotes, and student collaboration.
+            Transparent answers about our engineering methodology, component sourcing, milestone
+            quotes, and collaboration for students, startups, and businesses.
           </p>
         </div>
 
@@ -121,7 +119,8 @@ function FaqPage() {
                 Still have an unanswered question?
               </h3>
               <p className="mt-2 text-white/85 text-xs sm:text-sm max-w-md leading-relaxed">
-                Reach out with your project ideas or specific circuit component requirements. We respond within 24 hours.
+                Reach out with your project ideas or specific circuit component requirements. We
+                respond within 24 hours.
               </p>
             </div>
 

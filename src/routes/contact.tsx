@@ -3,7 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Clock, MapPin, Send, CheckCircle2, LoaderCircle, MessageSquare, Phone, MessageCircle } from "lucide-react";
+import {
+  Mail,
+  Clock,
+  MapPin,
+  Send,
+  CheckCircle2,
+  LoaderCircle,
+  MessageSquare,
+  Phone,
+  MessageCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { contact, phoneDisplay, whatsappNumber } from "@/data/site";
 import { whatsappUrl, normalizeWhatsApp } from "@/lib/whatsapp";
@@ -67,10 +77,7 @@ function ContactPage() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <PageHeader
-        title="Contact Us"
-        breadcrumb={[{ label: "Contact" }]}
-      />
+      <PageHeader title="Contact Us" breadcrumb={[{ label: "Contact" }]} />
 
       <main className="container py-12 md:py-20">
         {/* Intro */}
@@ -83,8 +90,8 @@ function ContactPage() {
             Let's Talk About Your Next Hardware or Software Project
           </h1>
           <p className="mt-4 text-muted-foreground text-sm sm:text-base leading-relaxed">
-            Have questions about microcontroller compatibility, PCB schematics, or milestone timelines? 
-            Drop us a message or reach out through our engineering desk.
+            Have questions about microcontroller compatibility, PCB schematics, or milestone
+            timelines? Drop us a message or reach out through our engineering desk.
           </p>
         </div>
 
@@ -128,10 +135,7 @@ function ContactPage() {
                       Phone &amp; WhatsApp
                     </span>
                     <h3 className="font-heading font-bold text-base sm:text-lg text-foreground mt-0.5">
-                      <a
-                        href="tel:+916369570661"
-                        className="hover:text-royal transition-colors"
-                      >
+                      <a href="tel:+916369570661" className="hover:text-royal transition-colors">
                         {phoneDisplay}
                       </a>
                     </h3>
@@ -165,7 +169,8 @@ function ContactPage() {
                       {contact.workingHours}
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Active workbench hours for scheduled live design reviews and code walkthroughs.
+                      Active workbench hours for scheduled live design reviews and code
+                      walkthroughs.
                     </p>
                   </div>
                 </div>
@@ -186,7 +191,8 @@ function ContactPage() {
                       {contact.city}
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Student engineering collective and hardware prototyping workbench.
+                      Hardware prototyping workbench and engineering collective serving students,
+                      startups, and businesses.
                     </p>
                   </div>
                 </div>
@@ -216,7 +222,8 @@ function ContactPage() {
                       Message Sent Successfully!
                     </h3>
                     <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-                      Thank you for contacting Nexora. We have received your message and will review it promptly.
+                      Thank you for contacting Nexora. We have received your message and will review
+                      it promptly.
                     </p>
                     <Button
                       type="button"
@@ -309,13 +316,18 @@ function ContactPage() {
                             : "border-border focus:border-royal focus:ring-royal/30"
                         } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all`}
                         aria-invalid={!!errors.phone}
-                        aria-describedby={errors.phone ? "contact-phone-error" : "contact-phone-desc"}
+                        aria-describedby={
+                          errors.phone ? "contact-phone-error" : "contact-phone-desc"
+                        }
                       />
                       <p id="contact-phone-desc" className="text-[11px] text-muted-foreground mt-1">
                         We'll contact you on this number via WhatsApp.
                       </p>
                       {errors.phone && (
-                        <p id="contact-phone-error" className="text-xs text-destructive mt-1.5 font-medium">
+                        <p
+                          id="contact-phone-error"
+                          className="text-xs text-destructive mt-1.5 font-medium"
+                        >
                           {errors.phone.message}
                         </p>
                       )}
@@ -344,7 +356,10 @@ function ContactPage() {
                         aria-describedby={errors.message ? "message-error" : undefined}
                       />
                       {errors.message && (
-                        <p id="message-error" className="text-xs text-destructive mt-1.5 font-medium">
+                        <p
+                          id="message-error"
+                          className="text-xs text-destructive mt-1.5 font-medium"
+                        >
                           {errors.message.message}
                         </p>
                       )}
@@ -379,4 +394,3 @@ function ContactPage() {
     </div>
   );
 }
-

@@ -25,10 +25,7 @@ export const Route = createFileRoute("/services")({
 function Services() {
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <PageHeader
-        title="Our Services"
-        breadcrumb={[{ label: "Services" }]}
-      />
+      <PageHeader title="Our Services" breadcrumb={[{ label: "Services" }]} />
 
       <main className="container py-12 md:py-16">
         {/* Intro Section */}
@@ -37,11 +34,12 @@ function Services() {
             <span>ENGINEERING DISCIPLINES</span>
           </div>
           <h1 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl text-foreground tracking-tight leading-tight">
-            Specialized Engineering for Student Builders & Innovators
+            Specialized Engineering for Students, Startups &amp; Businesses
           </h1>
           <p className="mt-4 text-muted-foreground text-sm sm:text-base leading-relaxed">
-            From circuit schematics and firmware coding to cloud backends and final academic project reports, 
-            explore our four engineering disciplines tailored to turn ambitious concepts into working reality.
+            From circuit schematics and firmware coding to cloud backends and final documentation,
+            explore our four engineering disciplines tailored to turn ambitious concepts into
+            working reality.
           </p>
         </div>
 
@@ -182,7 +180,8 @@ function Services() {
                     How It Works
                   </h3>
                   <p className="mt-1.5 text-muted-foreground text-sm max-w-xl leading-relaxed">
-                    A streamlined, predictable six-step methodology from initial inquiry to test-verified delivery.
+                    A streamlined, predictable six-step methodology from initial inquiry to
+                    test-verified delivery.
                   </p>
                 </div>
 

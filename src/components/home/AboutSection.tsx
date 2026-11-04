@@ -103,9 +103,10 @@ export function AboutSection() {
 
             {/* Short paragraph */}
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-6">
-              Nexora bridges the gap between academic theory and real-world hardware. From microcontroller
-              firmware and custom PCB schematics to VLSI architecture, our student-led team provides
-              hands-on guidance and engineering support to turn your vision into a test-ready prototype.
+              Nexora bridges the gap between academic theory and real-world hardware. From
+              microcontroller firmware and custom PCB schematics to VLSI architecture, our
+              student-led team provides hands-on guidance and engineering support to turn your
+              vision into a test-ready prototype.
             </p>
 
             {/* Two icon feature rows */}
@@ -145,7 +146,9 @@ export function AboutSection() {
                 <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-royal/10 dark:bg-royal/20 text-royal dark:text-glow">
                   <Check className="size-3.5" />
                 </div>
-                <span>One-on-one student engineering mentorship & code reviews</span>
+                <span>
+                  Engineering mentorship &amp; code reviews for students, startups, and businesses
+                </span>
               </li>
               <li className="flex items-center gap-3 text-sm text-foreground">
                 <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-royal/10 dark:bg-royal/20 text-royal dark:text-glow">

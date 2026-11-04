@@ -11,7 +11,7 @@ export const Route = createFileRoute("/about")({
   head: () =>
     meta(
       "About Nexora",
-      "Meet Nexora, a student engineering collective delivering embedded systems, IoT hardware prototypes, and hands-on project mentorship.",
+      "Meet Nexora, an engineering collective delivering embedded systems, IoT hardware prototypes, and hands-on guidance for students, startups, and businesses.",
     ),
   component: About,
 });
@@ -25,9 +25,9 @@ const VALUES = [
   },
   {
     icon: Users,
-    title: "Student-Led Mentorship",
+    title: "Engineering Mentorship",
     description:
-      "We don't just build prototypes; we walk you through the architecture and code so you ace your demos and defense.",
+      "We don't just build prototypes; we walk you through the architecture and code so students, startups, and teams master their solutions.",
   },
   {
     icon: ShieldCheck,
@@ -46,10 +46,7 @@ const VALUES = [
 function About() {
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <PageHeader
-        title="About Us"
-        breadcrumb={[{ label: "About" }]}
-      />
+      <PageHeader title="About Us" breadcrumb={[{ label: "About" }]} />
 
       <main className="container py-12 md:py-20">
         {/* Story Section */}
@@ -60,18 +57,21 @@ function About() {
                 <span>OUR STORY</span>
               </div>
               <h1 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl text-foreground tracking-tight leading-tight mb-6">
-                From Breadboard Experiments to Student Innovation
+                From Breadboard Experiments to Real-World Innovation
               </h1>
               <div className="space-y-4 text-muted-foreground text-sm sm:text-base leading-relaxed">
                 <p>
-                  Nexora started with a straightforward realization: engineering students often have groundbreaking concepts 
-                  for IoT devices, assistive robotics, and digital logic systems, but get stuck between abstract classroom theory 
-                  and the messy realities of hardware debugging.
+                  Nexora started with a straightforward realization: students, founders, and
+                  innovators often have groundbreaking concepts for IoT devices, assistive robotics,
+                  and digital logic systems, but get stuck between abstract theory and the messy
+                  realities of hardware debugging.
                 </p>
                 <p>
-                  We founded Nexora as a peer-driven engineering workshop where fellow students collaborate with experienced builders. 
-                  Whether it is troubleshooting an I2C communication bus, writing bare-metal firmware for an ESP32, or synthesizing 
-                  Verilog on an FPGA, we provide the workbench, the test equipment, and the dedicated guidance to bring ideas to life.
+                  We founded Nexora as a dedicated engineering workshop where builders collaborate
+                  directly with experienced developers. Whether it is troubleshooting an I2C
+                  communication bus, writing bare-metal firmware for an ESP32, or synthesizing
+                  Verilog on an FPGA, we provide the workbench, the test equipment, and the
+                  dedicated guidance to bring ideas to life for students, startups, and businesses.
                 </p>
               </div>
             </div>
@@ -111,8 +111,9 @@ function About() {
                 Democratizing Advanced Embedded & Hardware Engineering for Every Builder
               </h2>
               <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-8">
-                Our mission is to bridge the gap between classroom theory and real-world technology. We empower builders 
-                with hands-on hardware testing, clean production-ready code, and one-on-one technical mentorship.
+                Our mission is to bridge the gap between classroom theory and real-world technology.
+                We empower builders with hands-on hardware testing, clean production-ready code, and
+                one-on-one technical mentorship.
               </p>
               <Button
                 asChild
@@ -139,7 +140,8 @@ function About() {
                 The Principles That Guide Every Prototype
               </h2>
               <p className="mt-3 text-muted-foreground text-sm sm:text-base leading-relaxed">
-                We measure our success by the technical clarity and confidence our partners gain throughout the development process.
+                We measure our success by the technical clarity and confidence our partners gain
+                throughout the development process.
               </p>
             </div>
 
@@ -181,7 +183,8 @@ function About() {
                   Meet the Engineering Leads
                 </h2>
                 <p className="mt-3 text-muted-foreground text-sm sm:text-base leading-relaxed">
-                  Three passionate student developers with a shared obsession for hardware, firmware, and modern web applications.
+                  Three passionate student developers with a shared obsession for hardware,
+                  firmware, and modern web applications.
                 </p>
               </div>
 
@@ -192,11 +195,7 @@ function About() {
                     className="flex flex-col items-center text-center p-8 rounded-3xl border border-border bg-card shadow-sm hover:shadow-md transition-all hover:-translate-y-1"
                   >
                     <div className="mb-6 flex justify-center">
-                      <InitialsAvatar
-                        name={member.name}
-                        photo={member.photo}
-                        size="lg"
-                      />
+                      <InitialsAvatar name={member.name} photo={member.photo} size="lg" />
                     </div>
                     <div className="w-full flex flex-col items-center">
                       <h3 className="font-heading font-bold text-xl text-foreground">

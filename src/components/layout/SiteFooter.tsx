@@ -14,7 +14,15 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
-import { navigation, contact, socialLinks, services, tagline, phoneDisplay, whatsappNumber } from "@/data/site";
+import {
+  navigation,
+  contact,
+  socialLinks,
+  services,
+  tagline,
+  phoneDisplay,
+  whatsappNumber,
+} from "@/data/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 
@@ -62,13 +70,11 @@ export function SiteFooter() {
           {/* Column 1: Full Logo & Brief Description */}
           <div className="flex flex-col items-start gap-4">
             <Link to="/" aria-label="Nexora home" className="inline-block">
-              <Logo
-                variant="full"
-                className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
-              />
+              <Logo variant="full" className="h-10 sm:h-12 w-auto object-contain drop-shadow-md" />
             </Link>
             <p className="text-xs sm:text-sm text-white/70 leading-relaxed mt-2 max-w-xs">
-              Empowering engineers and innovators with cutting-edge Embedded IoT, VLSI, and modern software development.
+              Empowering engineers and innovators with cutting-edge Embedded IoT, VLSI, and modern
+              software development.
             </p>
             {/* Social Icons */}
             <div className="flex items-center gap-3 mt-2">
@@ -192,10 +198,7 @@ export function SiteFooter() {
               </li>
               <li className="flex items-start gap-2.5">
                 <Phone size={15} className="text-glow shrink-0 mt-0.5" />
-                <a
-                  href="tel:+916369570661"
-                  className="hover:text-white transition-colors"
-                >
+                <a href="tel:+916369570661" className="hover:text-white transition-colors">
                   {phoneDisplay}
                 </a>
               </li>
@@ -224,15 +227,10 @@ export function SiteFooter() {
 
         {/* Bottom Bar: Tagline & Copyright */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-white/60 text-center sm:text-left">
-          <div className="font-heading text-sm tracking-wide text-white">
-            {renderTagline()}
-          </div>
-          <div>
-            © {new Date().getFullYear()} Nexora Technologies. All rights reserved.
-          </div>
+          <div className="font-heading text-sm tracking-wide text-white">{renderTagline()}</div>
+          <div>© {new Date().getFullYear()} Nexora Technologies. All rights reserved.</div>
         </div>
       </div>
     </footer>
   );
 }
-

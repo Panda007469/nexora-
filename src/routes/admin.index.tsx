@@ -22,10 +22,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/")({
   head: () =>
-    meta(
-      "Admin Dashboard",
-      "Overview of customer requests and active engineering pipeline.",
-    ),
+    meta("Admin Dashboard", "Overview of customer requests and active engineering pipeline."),
   component: AdminDashboard,
 });
 
@@ -53,7 +50,11 @@ function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: queryError, count } = await supabase
+      const {
+        data,
+        error: queryError,
+        count,
+      } = await supabase
         .from("requests")
         .select("*", { count: "exact" })
         .order("created_at", { ascending: false })
@@ -217,9 +218,7 @@ function AdminDashboard() {
               <h3 className="font-heading font-bold text-base text-foreground">
                 Unable to Load Requests
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {error}
-              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{error}</p>
               <Button
                 type="button"
                 variant="outline"
@@ -241,11 +240,10 @@ function AdminDashboard() {
               <div className="size-12 rounded-full bg-muted text-muted-foreground flex items-center justify-center">
                 <Inbox className="size-6" />
               </div>
-              <h3 className="font-heading font-bold text-base text-foreground">
-                No Requests Yet
-              </h3>
+              <h3 className="font-heading font-bold text-base text-foreground">No Requests Yet</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                When students or clients submit the project request form, their submissions will appear here.
+                When students or clients submit the project request form, their submissions will
+                appear here.
               </p>
             </div>
           </div>
@@ -293,15 +291,9 @@ function AdminDashboard() {
 
                     return (
                       <tr key={row.id} className="hover:bg-muted/40 transition-colors">
-                        <td className="py-3.5 px-4 font-mono font-bold text-foreground">
-                          {code}
-                        </td>
-                        <td className="py-3.5 px-4 font-medium text-foreground">
-                          {name}
-                        </td>
-                        <td className="py-3.5 px-4 text-muted-foreground">
-                          {email}
-                        </td>
+                        <td className="py-3.5 px-4 font-mono font-bold text-foreground">{code}</td>
+                        <td className="py-3.5 px-4 font-medium text-foreground">{name}</td>
+                        <td className="py-3.5 px-4 text-muted-foreground">{email}</td>
                         <td className="py-3.5 px-4">
                           {(() => {
                             const wa = row.phone
@@ -325,12 +317,8 @@ function AdminDashboard() {
                             );
                           })()}
                         </td>
-                        <td className="py-3.5 px-4 capitalize text-foreground">
-                          {service}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          {getStatusBadge(row.status)}
-                        </td>
+                        <td className="py-3.5 px-4 capitalize text-foreground">{service}</td>
+                        <td className="py-3.5 px-4">{getStatusBadge(row.status)}</td>
                         <td className="py-3.5 px-4 text-muted-foreground whitespace-nowrap">
                           {formatDate(row.created_at)}
                         </td>
@@ -346,4 +334,3 @@ function AdminDashboard() {
     </div>
   );
 }
-

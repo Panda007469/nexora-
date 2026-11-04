@@ -28,4 +28,3 @@ export function FadeUp({ children, delay = 0, className }: FadeUpProps) {
 }
 
 export default FadeUp;
-

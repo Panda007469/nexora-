@@ -21,10 +21,12 @@ import {
   Clock,
   Copy,
   Phone,
+  Briefcase,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { services, steps } from "@/data/site";
-import { requestSchema } from "@/data/request";
+import { requestSchema, requestFields, CUSTOMER_TYPES, getTodayIsoDate } from "@/data/request";
 import { meta } from "@/components/nexora/shared";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FadeUp } from "@/components/layout/FadeUp";
@@ -47,7 +49,7 @@ export const Route = createFileRoute("/request")({
   head: () =>
     meta(
       "Request a Service",
-      "Tell Nexora about your student project and the engineering prototyping support you need.",
+      "Tell Nexora about your project and the engineering prototyping support you need for students, startups, or businesses.",
     ),
   component: Request,
 });
@@ -59,24 +61,36 @@ const STEPS = [
   { id: "review", label: "Review & Submit", short: "Review" },
 ] as const;
 
-// Per-step schemas using exact field definitions from requestSchema
-const step1Schema = z.object({
-  name: requestSchema.shape.name,
-  college: requestSchema.shape.college,
-  email: requestSchema.shape.email,
-  phone: requestSchema.shape.phone,
-});
+// Per-step schemas using exact field definitions from requestSchema / requestFields
+const step1Schema = z
+  .object({
+    customer_type: requestFields.shape.customer_type,
+    name: requestFields.shape.name,
+    college: requestFields.shape.college,
+    email: requestFields.shape.email,
+    phone: requestFields.shape.phone,
+  })
+  .superRefine((data, ctx) => {
+    if (data.customer_type === "Student" && !data.college?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["college"],
+        message: "Please enter your college / organization.",
+      });
+    }
+  });
 
 const step2Schema = z.object({
-  service: requestSchema.shape.service,
-  deadline: requestSchema.shape.deadline,
+  service: requestFields.shape.service,
+  deadline: requestFields.shape.deadline,
 });
 
 const step3Schema = z.object({
-  description: requestSchema.shape.description,
+  description: requestFields.shape.description,
 });
 
 function mapToRpcPayload(v: {
+  customer_type: string;
   name: string;
   email: string;
   phone: string;
@@ -91,7 +105,7 @@ function mapToRpcPayload(v: {
     phone: normalizeWhatsApp(v.phone) ?? v.phone,
     org: v.college,
     city: "",
-    customer_type: "student",
+    customer_type: v.customer_type,
     service: v.service,
     idea: v.description,
     tech_details: "",
@@ -106,6 +120,7 @@ function Request() {
   const [currentStep, setCurrentStep] = useState(0);
 
   const [values, setValues] = useState({
+    customer_type: "",
     name: "",
     college: "",
     email: "",
@@ -126,6 +141,9 @@ function Request() {
     setErrors((prev) => {
       const next = { ...prev };
       delete next[key];
+      if (key === "customer_type" && value !== "Student") {
+        delete next.college;
+      }
       return next;
     });
   }
@@ -134,6 +152,7 @@ function Request() {
   function handleNext() {
     if (currentStep === 0) {
       const result = step1Schema.safeParse({
+        customer_type: values.customer_type,
         name: values.name,
         college: values.college,
         email: values.email,
@@ -194,7 +213,7 @@ function Request() {
       setErrors(next);
 
       // Return to first step with an error
-      if (next.name || next.college || next.email || next.phone) {
+      if (next.customer_type || next.name || next.college || next.email || next.phone) {
         setCurrentStep(0);
       } else if (next.service || next.deadline) {
         setCurrentStep(1);
@@ -226,10 +245,7 @@ function Request() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <PageHeader
-        title="Request a Service"
-        breadcrumb={[{ label: "Request" }]}
-      />
+      <PageHeader title="Request a Service" breadcrumb={[{ label: "Request" }]} />
 
       <main className="container py-12 md:py-20">
         {/* Intro */}
@@ -241,7 +257,8 @@ function Request() {
             Tell Us What You Have in Mind
           </h1>
           <p className="mt-3 text-muted-foreground text-sm sm:text-base leading-relaxed">
-            A concept, a breadboard build in need of debugging, or an end-to-end prototype. Complete our 4-step request form to begin.
+            A concept, a breadboard build in need of debugging, or an end-to-end prototype. Complete
+            our 4-step request form to begin.
           </p>
         </div>
 
@@ -298,8 +315,8 @@ function Request() {
                               isDone
                                 ? "bg-emerald-500 text-white shadow-2xs"
                                 : isCurrent
-                                ? "bg-brand-gradient text-white shadow-sm ring-4 ring-royal/20"
-                                : "bg-muted text-muted-foreground border border-border",
+                                  ? "bg-brand-gradient text-white shadow-sm ring-4 ring-royal/20"
+                                  : "bg-muted text-muted-foreground border border-border",
                             )}
                           >
                             {isDone ? <Check className="size-4 stroke-[3]" /> : idx + 1}
@@ -328,8 +345,9 @@ function Request() {
                       {`You're all set, ${values.name.split(" ")[0]}!`}
                     </h2>
                     <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed mb-6">
-                      Your request has been submitted. An engineering lead will review it and reply to{" "}
-                      <strong className="text-foreground">{values.email}</strong> within 24 hours.
+                      Your request has been submitted. An engineering lead will review it and reply
+                      to <strong className="text-foreground">{values.email}</strong> within 24
+                      hours.
                     </p>
 
                     {/* Tracking info */}
@@ -400,6 +418,7 @@ function Request() {
                         setTrackingToken("");
                         setCopied(false);
                         setValues({
+                          customer_type: "",
                           name: "",
                           college: "",
                           email: "",
@@ -424,8 +443,63 @@ function Request() {
                             Personal &amp; Academic Information
                           </h2>
                           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                            Let us know who you are and where you are studying.
+                            Let us know who you are and where you are studying or working.
                           </p>
+                        </div>
+
+                        {/* I am a */}
+                        <div>
+                          <label
+                            htmlFor="customer_type"
+                            className="block text-xs font-bold font-display uppercase tracking-wider text-foreground mb-2"
+                          >
+                            I am a <span className="text-magenta">*</span>
+                          </label>
+                          <div className="relative">
+                            <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                            <select
+                              id="customer_type"
+                              value={values.customer_type}
+                              onChange={(e) => update("customer_type", e.target.value)}
+                              aria-invalid={!!errors.customer_type}
+                              aria-describedby={
+                                errors.customer_type ? "customer_type-error" : undefined
+                              }
+                              className={cn(
+                                "w-full h-11 rounded-xl pl-10 pr-10 text-sm bg-background border text-foreground focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
+                                errors.customer_type
+                                  ? "border-destructive focus:ring-destructive/30"
+                                  : "border-border focus:border-royal focus:ring-royal/30",
+                                !values.customer_type && "text-muted-foreground",
+                              )}
+                            >
+                              <option
+                                value=""
+                                disabled
+                                className="text-muted-foreground bg-background"
+                              >
+                                Select who you are...
+                              </option>
+                              {CUSTOMER_TYPES.map((type) => (
+                                <option
+                                  key={type}
+                                  value={type}
+                                  className="text-foreground bg-background"
+                                >
+                                  {type}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                          </div>
+                          {errors.customer_type && (
+                            <p
+                              id="customer_type-error"
+                              className="text-xs text-destructive mt-1.5 font-medium"
+                            >
+                              {errors.customer_type}
+                            </p>
+                          )}
                         </div>
 
                         {/* Name */}
@@ -456,19 +530,29 @@ function Request() {
                             />
                           </div>
                           {errors.name && (
-                            <p id="name-error" className="text-xs text-destructive mt-1.5 font-medium">
+                            <p
+                              id="name-error"
+                              className="text-xs text-destructive mt-1.5 font-medium"
+                            >
                               {errors.name}
                             </p>
                           )}
                         </div>
 
-                        {/* College */}
+                        {/* College / Organization */}
                         <div>
                           <label
                             htmlFor="college"
                             className="block text-xs font-bold font-display uppercase tracking-wider text-foreground mb-2"
                           >
-                            College / University <span className="text-magenta">*</span>
+                            College / Organization{" "}
+                            {values.customer_type === "Student" ? (
+                              <span className="text-magenta">*</span>
+                            ) : (
+                              <span className="text-[11px] text-muted-foreground font-normal lowercase">
+                                (optional)
+                              </span>
+                            )}
                           </label>
                           <div className="relative">
                             <School className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
@@ -477,7 +561,11 @@ function Request() {
                               type="text"
                               autoComplete="organization"
                               value={values.college}
-                              placeholder="e.g. RV College of Engineering"
+                              placeholder={
+                                values.customer_type === "Student"
+                                  ? "e.g. RV College of Engineering"
+                                  : "e.g. Company name, university, or lab (optional)"
+                              }
                               onChange={(e) => update("college", e.target.value)}
                               aria-invalid={!!errors.college}
                               aria-describedby={errors.college ? "college-error" : undefined}
@@ -490,7 +578,10 @@ function Request() {
                             />
                           </div>
                           {errors.college && (
-                            <p id="college-error" className="text-xs text-destructive mt-1.5 font-medium">
+                            <p
+                              id="college-error"
+                              className="text-xs text-destructive mt-1.5 font-medium"
+                            >
                               {errors.college}
                             </p>
                           )}
@@ -524,7 +615,10 @@ function Request() {
                             />
                           </div>
                           {errors.email && (
-                            <p id="email-error" className="text-xs text-destructive mt-1.5 font-medium">
+                            <p
+                              id="email-error"
+                              className="text-xs text-destructive mt-1.5 font-medium"
+                            >
                               {errors.email}
                             </p>
                           )}
@@ -562,7 +656,10 @@ function Request() {
                             We'll contact you on this number via WhatsApp.
                           </p>
                           {errors.phone && (
-                            <p id="phone-error" className="text-xs text-destructive mt-1.5 font-medium">
+                            <p
+                              id="phone-error"
+                              className="text-xs text-destructive mt-1.5 font-medium"
+                            >
                               {errors.phone}
                             </p>
                           )}
@@ -578,7 +675,8 @@ function Request() {
                             Service Type &amp; Completion Timeline
                           </h2>
                           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                            Choose the discipline that fits your requirements and select your target completion date.
+                            Choose the discipline that fits your requirements and select your target
+                            completion date.
                           </p>
                         </div>
 
@@ -628,7 +726,10 @@ function Request() {
                             })}
                           </div>
                           {errors.service && (
-                            <p id="service-error" className="text-xs text-destructive mt-2 font-medium">
+                            <p
+                              id="service-error"
+                              className="text-xs text-destructive mt-2 font-medium"
+                            >
                               {errors.service}
                             </p>
                           )}
@@ -647,6 +748,7 @@ function Request() {
                             <input
                               id="deadline"
                               type="date"
+                              min={getTodayIsoDate()}
                               value={values.deadline}
                               onChange={(e) => update("deadline", e.target.value)}
                               aria-invalid={!!errors.deadline}
@@ -660,7 +762,10 @@ function Request() {
                             />
                           </div>
                           {errors.deadline && (
-                            <p id="deadline-error" className="text-xs text-destructive mt-1.5 font-medium">
+                            <p
+                              id="deadline-error"
+                              className="text-xs text-destructive mt-1.5 font-medium"
+                            >
                               {errors.deadline}
                             </p>
                           )}
@@ -676,7 +781,8 @@ function Request() {
                             Project Brief &amp; Technical Requirements
                           </h2>
                           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                            Describe what you want to build, existing components or sensors, and specific guidance needed.
+                            Describe what you want to build, existing components or sensors, and
+                            specific guidance needed.
                           </p>
                         </div>
 
@@ -703,7 +809,10 @@ function Request() {
                             )}
                           />
                           {errors.description && (
-                            <p id="description-error" className="text-xs text-destructive mt-1.5 font-medium">
+                            <p
+                              id="description-error"
+                              className="text-xs text-destructive mt-1.5 font-medium"
+                            >
                               {errors.description}
                             </p>
                           )}
@@ -719,7 +828,8 @@ function Request() {
                             Review Your Project Request
                           </h2>
                           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                            Please check your details before submitting. You can edit any section below.
+                            Please check your details before submitting. You can edit any section
+                            below.
                           </p>
                         </div>
 
@@ -740,22 +850,38 @@ function Request() {
                               <Edit2 className="size-3 mr-1" /> Edit
                             </Button>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
                             <div>
-                              <span className="text-muted-foreground block">Full Name:</span>
-                              <strong className="text-foreground text-sm">{values.name || "—"}</strong>
+                              <span className="text-muted-foreground block">I am a:</span>
+                              <strong className="text-foreground text-sm">
+                                {values.customer_type || "—"}
+                              </strong>
                             </div>
                             <div>
-                              <span className="text-muted-foreground block">College:</span>
-                              <strong className="text-foreground text-sm">{values.college || "—"}</strong>
+                              <span className="text-muted-foreground block">Full Name:</span>
+                              <strong className="text-foreground text-sm">
+                                {values.name || "—"}
+                              </strong>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground block">
+                                College / Organization:
+                              </span>
+                              <strong className="text-foreground text-sm">
+                                {values.college || "—"}
+                              </strong>
                             </div>
                             <div>
                               <span className="text-muted-foreground block">Email:</span>
-                              <strong className="text-foreground text-sm">{values.email || "—"}</strong>
+                              <strong className="text-foreground text-sm">
+                                {values.email || "—"}
+                              </strong>
                             </div>
                             <div>
                               <span className="text-muted-foreground block">WhatsApp:</span>
-                              <strong className="text-foreground text-sm">{values.phone || "—"}</strong>
+                              <strong className="text-foreground text-sm">
+                                {values.phone || "—"}
+                              </strong>
                             </div>
                           </div>
                         </div>
@@ -785,7 +911,9 @@ function Request() {
                               </strong>
                             </div>
                             <div>
-                              <span className="text-muted-foreground block">Target Completion Date:</span>
+                              <span className="text-muted-foreground block">
+                                Target Completion Date:
+                              </span>
                               <strong className="text-foreground text-sm">
                                 {values.deadline || "—"}
                               </strong>
@@ -903,7 +1031,8 @@ function Request() {
 
                 <div className="mt-8 pt-6 border-t border-border/70 text-xs text-muted-foreground">
                   <p>
-                    <strong>Prompt Engineering Review:</strong> Every inquiry is reviewed by student leads with hands-on workbench experience.
+                    <strong>Prompt Engineering Review:</strong> Every inquiry is reviewed by
+                    experienced engineering leads with hands-on workbench experience.
                   </p>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,10 +26,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const Route = createFileRoute("/login")({
   head: () =>
-    meta(
-      "Log In",
-      "Sign in to access the Nexora administration portal and member dashboard.",
-    ),
+    meta("Log In", "Sign in to access the Nexora administration portal and member dashboard."),
   component: Login,
 });
 
@@ -52,17 +49,20 @@ function Login() {
     },
   });
 
-  const handleRoleRedirect = (targetRole: Role | string | undefined | null) => {
-    if (redirectedRef.current) return;
-    redirectedRef.current = true;
+  const handleRoleRedirect = useCallback(
+    (targetRole: Role | string | undefined | null) => {
+      if (redirectedRef.current) return;
+      redirectedRef.current = true;
 
-    if (targetRole === "admin") {
-      void navigate({ to: "/admin" as any });
-    } else {
-      toast.error("Your account has no admin access");
-      void navigate({ to: "/" });
-    }
-  };
+      if (targetRole === "admin") {
+        void navigate({ to: "/admin" });
+      } else {
+        toast.error("Your account has no admin access");
+        void navigate({ to: "/" });
+      }
+    },
+    [navigate],
+  );
 
   // If already signed in on initial mount, wait for loading to finish and redirect
   useEffect(() => {
@@ -70,7 +70,7 @@ function Login() {
     if (!user) return;
 
     handleRoleRedirect(role);
-  }, [loading, user, role]);
+  }, [loading, user, role, handleRoleRedirect]);
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsSubmitting(true);
@@ -95,7 +95,8 @@ function Login() {
         handleRoleRedirect(userRole);
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred during sign in.";
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred during sign in.";
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -104,10 +105,7 @@ function Login() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <PageHeader
-        title="Account Log In"
-        breadcrumb={[{ label: "Login" }]}
-      />
+      <PageHeader title="Account Log In" breadcrumb={[{ label: "Login" }]} />
 
       <main className="container py-12 md:py-20">
         <div className="max-w-lg mx-auto">

@@ -19,10 +19,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () =>
-    meta(
-      "Admin Portal",
-      "Nexora internal administration portal and request management pipeline.",
-    ),
+    meta("Admin Portal", "Nexora internal administration portal and request management pipeline."),
   component: AdminLayout,
 });
 
@@ -218,7 +215,10 @@ function AdminLayout() {
                 <span className="text-[10px] uppercase font-bold text-muted-foreground block font-display">
                   Signed in as
                 </span>
-                <span className="text-xs font-medium text-foreground truncate block" title={user.email}>
+                <span
+                  className="text-xs font-medium text-foreground truncate block"
+                  title={user.email}
+                >
                   {user.email}
                 </span>
               </div>
@@ -244,4 +244,3 @@ function AdminLayout() {
     </div>
   );
 }
-

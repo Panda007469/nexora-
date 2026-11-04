@@ -35,8 +35,9 @@ export function ServicesSection() {
               What We Build
             </h2>
             <p className="mt-3 max-w-2xl text-white/70 text-sm sm:text-base leading-relaxed">
-              Explore our four core engineering service domains, designed to guide student concepts
-              from initial breadboard prototypes to finished, test-ready hardware.
+              Explore our four core engineering service domains, designed to guide prototypes from
+              initial concepts to finished, test-ready hardware for students, startups, and
+              businesses.
             </p>
           </div>
 
@@ -108,4 +109,3 @@ export function ServicesSection() {
     </section>
   );
 }
-

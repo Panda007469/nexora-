@@ -25,7 +25,8 @@ export function FaqPreviewSection() {
               Frequently Asked Questions
             </h2>
             <p className="mt-3 max-w-2xl text-muted-foreground text-sm sm:text-base leading-relaxed">
-              Quick answers about project kickoffs, component feasibility, pricing milestones, and technical mentorship.
+              Quick answers about project kickoffs, component feasibility, pricing milestones, and
+              technical mentorship.
             </p>
           </div>
 
@@ -79,4 +80,3 @@ export function FaqPreviewSection() {
     </section>
   );
 }
-

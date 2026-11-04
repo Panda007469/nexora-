@@ -21,7 +21,8 @@ export function CtaBanner() {
             Ready to build your project?
           </h2>
           <p className="text-white/85 text-sm sm:text-base max-w-xl">
-            From embedded IoT prototypes to full-stack applications, let's turn your ideas into functional, production-ready reality.
+            From embedded IoT prototypes to full-stack applications, let's turn your ideas into
+            functional, production-ready reality.
           </p>
         </div>
 
@@ -39,4 +40,3 @@ export function CtaBanner() {
     </section>
   );
 }
-

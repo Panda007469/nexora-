@@ -32,9 +32,7 @@ export function HowItWorksSection() {
               const formattedNumber = String(step.step).padStart(2, "0");
               return (
                 <FadeUp key={step.step} delay={index * 0.08} className="h-full">
-                  <div
-                    className="relative flex items-start lg:items-center lg:flex-col lg:text-center group h-full"
-                  >
+                  <div className="relative flex items-start lg:items-center lg:flex-col lg:text-center group h-full">
                     {/* Vertical connecting line for mobile (stacked) */}
                     {index < howItWorks.length - 1 && (
                       <div
@@ -67,4 +65,3 @@ export function HowItWorksSection() {
     </section>
   );
 }
-

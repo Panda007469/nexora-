@@ -10,13 +10,6 @@ export function Logo({ variant = "full", className }: LogoProps) {
   const height = isFull ? 377 : 250;
 
   return (
-    <img
-      src={src}
-      alt="Nexora Technologies"
-      width={width}
-      height={height}
-      className={className}
-    />
+    <img src={src} alt="Nexora Technologies" width={width} height={height} className={className} />
   );
 }
-

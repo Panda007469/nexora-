@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ExternalLink, Github, ArrowRight, CheckCircle2, Cpu, Wrench } from "lucide-react";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Github,
+  ArrowRight,
+  CheckCircle2,
+  Cpu,
+  Wrench,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { projects } from "@/data/projects";
 import { meta } from "@/components/nexora/shared";
@@ -16,7 +24,7 @@ export const Route = createFileRoute("/projects/$slug")({
   head: ({ loaderData }) =>
     meta(
       loaderData?.title ?? "Project unavailable",
-      loaderData?.summary ?? "Explore student projects by Nexora.",
+      loaderData?.summary ?? "Explore engineering projects by Nexora.",
     ),
   component: ProjectDetail,
 });
@@ -30,8 +38,8 @@ function ProjectDetail() {
     project.category === "Front-End"
       ? "software"
       : project.category === "Hardware"
-      ? "embedded"
-      : "embedded";
+        ? "embedded"
+        : "embedded";
 
   const galleryImages =
     project.gallery && project.gallery.length > 0
@@ -43,10 +51,7 @@ function ProjectDetail() {
       {/* Banner / PageHeader */}
       <PageHeader
         title={project.title}
-        breadcrumb={[
-          { label: "Projects", href: "/projects" },
-          { label: project.title },
-        ]}
+        breadcrumb={[{ label: "Projects", href: "/projects" }, { label: project.title }]}
       />
 
       <main className="container py-10 md:py-16">
@@ -160,9 +165,7 @@ function ProjectDetail() {
                 <h2 className="font-heading font-bold text-lg text-foreground mb-3">
                   The Idea Behind the Build
                 </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {project.summary}
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{project.summary}</p>
               </div>
 
               {/* Tech Stack Chips */}
@@ -195,11 +198,15 @@ function ProjectDetail() {
                   </li>
                   <li className="flex items-start gap-2.5 text-xs sm:text-sm text-foreground">
                     <CheckCircle2 className="size-4 shrink-0 text-emerald-500 mt-0.5" />
-                    <span>Full circuit schematic, pinout diagram, and production bill of materials.</span>
+                    <span>
+                      Full circuit schematic, pinout diagram, and production bill of materials.
+                    </span>
                   </li>
                   <li className="flex items-start gap-2.5 text-xs sm:text-sm text-foreground">
                     <CheckCircle2 className="size-4 shrink-0 text-emerald-500 mt-0.5" />
-                    <span>Clean modular codebase with setup documentation and demo instructions.</span>
+                    <span>
+                      Clean modular codebase with setup documentation and demo instructions.
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -211,7 +218,8 @@ function ProjectDetail() {
                     Have a similar project in mind?
                   </h3>
                   <p className="text-xs text-white/85 mt-1">
-                    Get paired with our student engineers to build your custom prototype.
+                    Get paired with our engineering leads to build your custom prototype for
+                    students, startups, or businesses.
                   </p>
                 </div>
                 <Button

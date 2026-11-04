@@ -118,7 +118,7 @@ export function HeroSlider() {
       />
 
       {/* Content overlay */}
-      <div className="container relative z-20 px-12 sm:px-16 md:px-20 text-center flex flex-col items-center justify-center py-12">
+      <div className="container relative z-20 px-6 sm:px-16 md:px-20 text-center flex flex-col items-center justify-center py-10 sm:py-12">
         {/* Orbitron Caps Tagline */}
         <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md mb-5 md:mb-6 shadow-sm">
           <span className="size-2 rounded-full bg-brand-gradient animate-pulse" />
@@ -130,9 +130,7 @@ export function HeroSlider() {
         {/* Heading: text-6xl to text-7xl on desktop */}
         <h1 className="font-heading font-extrabold text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.08] max-w-5xl text-center mx-auto mb-6 md:mb-8 drop-shadow-sm">
           From Your Idea to a{" "}
-          <span className="text-brand-gradient block sm:inline">
-            Working Embedded Prototype
-          </span>
+          <span className="text-brand-gradient block sm:inline">Working Embedded Prototype</span>
         </h1>
 
         {/* Subtitle description */}

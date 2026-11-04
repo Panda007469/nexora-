@@ -55,4 +55,3 @@ export function CountUp({
 }
 
 export default CountUp;
-

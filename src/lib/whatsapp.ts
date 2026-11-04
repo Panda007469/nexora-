@@ -10,4 +10,3 @@ export function whatsappUrl(phone: string, message = ""): string | null {
   if (!n) return null;
   return `https://wa.me/${n}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 }
-

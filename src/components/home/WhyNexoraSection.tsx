@@ -41,8 +41,9 @@ export function WhyNexoraSection() {
             Built for Real-World Success
           </h2>
           <p className="mt-3 text-muted-foreground text-sm sm:text-base leading-relaxed">
-            We provide the hands-on engineering rigor, transparent milestones, and technical mentorship
-            needed to take your embedded idea from paper to a fully functioning prototype.
+            We provide the hands-on engineering rigor, transparent milestones, and technical
+            mentorship needed to take your embedded idea from paper to a fully functioning
+            prototype.
           </p>
         </div>
 
@@ -83,4 +84,3 @@ export function WhyNexoraSection() {
     </section>
   );
 }
-

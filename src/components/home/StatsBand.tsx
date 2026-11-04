@@ -90,4 +90,3 @@ export function StatsBand() {
     </section>
   );
 }
-

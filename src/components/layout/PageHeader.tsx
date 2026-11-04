@@ -18,16 +18,14 @@ export function PageHeader({ title, breadcrumb = [] }: PageHeaderProps) {
       <div
         className="absolute inset-0 bg-cover bg-center pointer-events-none"
         style={{
-          backgroundImage: "url('/images/page-banner.webp'), linear-gradient(135deg, #00122B, #001B3D, #0A2347)",
+          backgroundImage:
+            "url('/images/page-banner.webp'), linear-gradient(135deg, #00122B, #001B3D, #0A2347)",
         }}
         aria-hidden="true"
       />
 
       {/* Navy overlay at 70% opacity */}
-      <div
-        className="absolute inset-0 bg-navy/70 pointer-events-none"
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-navy/70 pointer-events-none" aria-hidden="true" />
 
       {/* Large diagonal bg-brand-gradient shape on the right side (~35% width, partially transparent, clipped with polygon) */}
       <div

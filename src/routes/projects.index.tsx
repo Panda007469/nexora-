@@ -41,10 +41,7 @@ function Projects() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <PageHeader
-        title="Our Projects"
-        breadcrumb={[{ label: "Projects" }]}
-      />
+      <PageHeader title="Our Projects" breadcrumb={[{ label: "Projects" }]} />
 
       <main className="container py-12 md:py-16">
         {/* Intro */}
@@ -56,7 +53,8 @@ function Projects() {
             Built with Curiosity & Technical Rigor
           </h1>
           <p className="mt-4 text-muted-foreground text-sm sm:text-base leading-relaxed">
-            Circuits, firmware, and thoughtful engineering. Explore our sample prototypes and find inspiration for your own project build.
+            Circuits, firmware, and thoughtful engineering. Explore our sample prototypes and find
+            inspiration for your own project build.
           </p>
         </div>
 
@@ -123,8 +121,8 @@ function Projects() {
         {/* Result counter */}
         <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground mb-6 font-medium">
           <span>
-            Showing <strong className="text-foreground">{Math.min(filtered.length, limit)}</strong> of{" "}
-            <strong className="text-foreground">{filtered.length}</strong> projects
+            Showing <strong className="text-foreground">{Math.min(filtered.length, limit)}</strong>{" "}
+            of <strong className="text-foreground">{filtered.length}</strong> projects
           </span>
           {category !== "All projects" && (
             <span className="text-xs text-royal dark:text-glow">Filtered by: {category}</span>
@@ -238,7 +236,8 @@ function Projects() {
               No projects match your search
             </h3>
             <p className="text-sm text-muted-foreground mt-2 max-w-sm mx-auto">
-              We couldn't find any projects matching &quot;{query}&quot;. Try adjusting your keywords or category filters.
+              We couldn't find any projects matching &quot;{query}&quot;. Try adjusting your
+              keywords or category filters.
             </p>
             <Button
               variant="outline"

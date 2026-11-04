@@ -113,7 +113,8 @@ export const howItWorks: HowItWorksStep[] = [
   {
     step: 2,
     title: "Review",
-    description: "Our technical team reviews feasibility, component availability, and architecture.",
+    description:
+      "Our technical team reviews feasibility, component availability, and architecture.",
   },
   {
     step: 3,
@@ -123,7 +124,8 @@ export const howItWorks: HowItWorksStep[] = [
   {
     step: 4,
     title: "Quote",
-    description: "Receive a clear milestone breakdown, transparent schedule, and fixed budget quote.",
+    description:
+      "Receive a clear milestone breakdown, transparent schedule, and fixed budget quote.",
   },
   {
     step: 5,
@@ -133,7 +135,8 @@ export const howItWorks: HowItWorksStep[] = [
   {
     step: 6,
     title: "Delivery",
-    description: "Complete working system handover with source code, hardware schematics, and walkthrough.",
+    description:
+      "Complete working system handover with source code, hardware schematics, and walkthrough.",
   },
 ];
 
@@ -184,7 +187,7 @@ export const faqs: FAQItem[] = [
     question: "How can I track progress during project development?",
     topic: "Process & Milestones",
     answer:
-      "You receive continuous milestone updates, video demos of circuit breadboard testing, and direct chat communication with your assigned student builder.",
+      "You receive continuous milestone updates, video demos of circuit breadboard testing, and direct chat communication with your assigned builder.",
   },
   {
     question: "What support is provided upon final project delivery?",

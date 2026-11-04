@@ -7,12 +7,7 @@ interface InitialsAvatarProps {
   className?: string;
 }
 
-export function InitialsAvatar({
-  name,
-  photo,
-  size = "md",
-  className = "",
-}: InitialsAvatarProps) {
+export function InitialsAvatar({ name, photo, size = "md", className = "" }: InitialsAvatarProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 

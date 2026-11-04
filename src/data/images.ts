@@ -4,4 +4,3 @@ import frontend from "@/assets/frontend.jpg";
 import teamImage from "@/assets/team.jpg";
 
 export const images = { hero, robot, frontend, team: teamImage };
-

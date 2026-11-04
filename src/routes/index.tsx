@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
   head: () =>
     meta(
       "From Your Idea to a Working Embedded Prototype",
-      "Nexora delivers embedded systems, IoT hardware, and custom software builds with student-led innovation and hands-on guidance.",
+      "Nexora delivers embedded systems, IoT hardware, and custom software builds for students, startups, and businesses with hands-on guidance.",
     ),
   component: Home,
 });
