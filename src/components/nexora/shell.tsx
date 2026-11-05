@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   Menu,
@@ -11,16 +11,27 @@ import {
   Github,
   Linkedin,
   Twitter,
+  LogIn,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Brand } from "./shared";
 import { navigation, contact, socialLinks } from "@/data/site";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Logo } from "@/components/layout/Logo";
+import { useAuth } from "@/hooks/use-auth";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { role, loading } = useAuth();
   const pathname = useLocation({ select: (location) => location.pathname });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isAdmin = mounted && !loading && role === "admin";
 
   const getSocialIcon = (iconName: string) => {
     switch (iconName.toLowerCase()) {
@@ -54,19 +65,42 @@ export function SiteHeader() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            {socialLinks.map((social) => (
-              <a
-                key={social.name}
-                href={social.url}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={social.name}
-                className="text-white/70 hover:text-white transition-colors"
+          <div className="flex items-center gap-4">
+            {/* Team Login / Admin link */}
+            {isAdmin ? (
+              <Link
+                to="/admin"
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-glow hover:text-white transition-colors"
               >
-                {getSocialIcon(social.icon)}
-              </a>
-            ))}
+                <LayoutDashboard size={13} className="text-glow" />
+                <span>Admin</span>
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 text-[11px] text-white/80 hover:text-white transition-colors"
+              >
+                <LogIn size={13} className="text-glow" />
+                <span>Team Login</span>
+              </Link>
+            )}
+
+            <span className="h-3 w-px bg-white/20" aria-hidden="true" />
+
+            <div className="flex items-center gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={social.name}
+                  className="text-white/70 hover:text-white transition-colors"
+                >
+                  {getSocialIcon(social.icon)}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -168,6 +202,28 @@ export function SiteHeader() {
             <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
               <span className="text-xs text-muted-foreground">Switch Theme</span>
               <ThemeToggle />
+            </div>
+
+            <div className="border-t border-border pt-3">
+              {isAdmin ? (
+                <Link
+                  to="/admin"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 py-1.5 text-sm font-semibold text-royal dark:text-glow hover:underline"
+                >
+                  <LayoutDashboard size={16} />
+                  <span>Admin</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <LogIn size={16} />
+                  <span>Team Login</span>
+                </Link>
+              )}
             </div>
           </div>
         </nav>

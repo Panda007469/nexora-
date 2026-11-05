@@ -128,15 +128,6 @@ export function SiteFooter() {
                   <span>Request a Service</span>
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/login"
-                  className="inline-flex items-center gap-1.5 hover:text-white hover:translate-x-1 transition-all"
-                >
-                  <ArrowRight size={12} className="text-royal" />
-                  <span>Login</span>
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -228,7 +219,16 @@ export function SiteFooter() {
         {/* Bottom Bar: Tagline & Copyright */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-white/60 text-center sm:text-left">
           <div className="font-heading text-sm tracking-wide text-white">{renderTagline()}</div>
-          <div>© {new Date().getFullYear()} Nexora Technologies. All rights reserved.</div>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 gap-y-1">
+            <span>© {new Date().getFullYear()} Nexora Technologies. All rights reserved.</span>
+            <span className="text-white/30 hidden sm:inline">•</span>
+            <Link
+              to="/login"
+              className="text-white/60 hover:text-white transition-colors underline-offset-4 hover:underline"
+            >
+              Team Login
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

@@ -74,9 +74,9 @@ function AdminLayout() {
     },
     {
       label: "Requests",
-      to: "/admin#requests",
+      to: "/admin/requests",
       icon: FileText,
-      active: location.hash === "requests",
+      active: location.pathname.startsWith("/admin/requests"),
     },
   ];
 
@@ -128,9 +128,9 @@ function AdminLayout() {
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <a
+                <Link
                   key={item.label}
-                  href={item.to}
+                  to={item.to}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors",
@@ -141,7 +141,7 @@ function AdminLayout() {
                 >
                   <Icon className="size-4" />
                   <span>{item.label}</span>
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -182,9 +182,9 @@ function AdminLayout() {
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
-              <a
+              <Link
                 key={item.label}
-                href={item.to}
+                to={item.to}
                 className={cn(
                   "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold font-display tracking-wider uppercase transition-all",
                   item.active
@@ -194,7 +194,7 @@ function AdminLayout() {
               >
                 <Icon className="size-4" />
                 <span>{item.label}</span>
-              </a>
+              </Link>
             );
           })}
         </nav>
