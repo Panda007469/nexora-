@@ -23,8 +23,8 @@ interface RawProject {
   tech: string[];
   image: string;
   alt: string;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   summary?: string;
   published?: boolean;
 }
@@ -34,7 +34,7 @@ const rawProjects: RawProject[] = [
     title: "Smart Home Automation",
     category: "Hardware",
     tech: ["ESP32", "IoT", "C++"],
-    image: "/images/project-smart-home.webp",
+    image: "/images/projects/project-smart-home.webp",
     alt: "Smart Home Automation circuit board and IoT relay controller",
     width: 1672,
     height: 941,
@@ -46,7 +46,7 @@ const rawProjects: RawProject[] = [
     title: "Autonomous Obstacle-Avoiding Robot",
     category: "Embedded Systems",
     tech: ["Arduino", "Sensors", "C++"],
-    image: "/images/project-obstacle-robot.webp",
+    image: "/images/projects/project-obstacle-robot.webp",
     alt: "Autonomous obstacle-avoiding robotic rover with ultrasonic sensor",
     width: 1672,
     height: 941,
@@ -58,7 +58,7 @@ const rawProjects: RawProject[] = [
     title: "Student Productivity Dashboard",
     category: "Front-End",
     tech: ["React", "Tailwind CSS", "TypeScript"],
-    image: "/images/project-productivity-dashboard.webp",
+    image: "/images/projects/project-productivity-dashboard.webp",
     alt: "Student productivity and task management web dashboard UI",
     width: 1672,
     height: 941,
@@ -70,7 +70,7 @@ const rawProjects: RawProject[] = [
     title: "IoT Weather Station",
     category: "Embedded Systems",
     tech: ["ESP32", "DHT22", "MQTT"],
-    image: "/images/project-weather-station.webp",
+    image: "/images/projects/project-weather-station.webp",
     alt: "IoT weather telemetry station prototype with sensors and microcontroller",
     width: 1672,
     height: 941,
@@ -80,7 +80,7 @@ const rawProjects: RawProject[] = [
     title: "Digital Attendance System",
     category: "Hardware",
     tech: ["RFID", "Arduino", "LCD"],
-    image: "/images/project-attendance-system.webp",
+    image: "/images/projects/project-attendance-system.webp",
     alt: "Digital RFID attendance logging system workbench prototype",
     width: 1536,
     height: 1024,
@@ -90,7 +90,7 @@ const rawProjects: RawProject[] = [
     title: "Creative Portfolio Website",
     category: "Front-End",
     tech: ["React", "CSS", "Vite"],
-    image: "/images/project-portfolio-website.webp",
+    image: "/images/projects/project-portfolio-website.webp",
     alt: "Creative web portfolio design concept screenshot",
     width: 1672,
     height: 941,
@@ -100,7 +100,7 @@ const rawProjects: RawProject[] = [
     title: "Smart Irrigation Controller",
     category: "Embedded Systems",
     tech: ["ESP32", "Sensors", "C++"],
-    image: "/images/project-irrigation.webp",
+    image: "/images/projects/project-irrigation.webp",
     alt: "Smart automated irrigation controller with soil moisture probe",
     width: 1672,
     height: 941,
@@ -110,7 +110,7 @@ const rawProjects: RawProject[] = [
     title: "Bluetooth-Controlled Rover",
     category: "Hardware",
     tech: ["Arduino", "Bluetooth", "Motors"],
-    image: "/images/project-rover.webp",
+    image: "/images/projects/project-rover.webp",
     alt: "Bluetooth-controlled RC chassis rover prototype",
     width: 1672,
     height: 941,
@@ -120,7 +120,7 @@ const rawProjects: RawProject[] = [
     title: "Campus Events Platform",
     category: "Front-End",
     tech: ["React", "Tailwind CSS"],
-    image: "/images/project-campus-events.webp",
+    image: "/images/projects/project-campus-events.webp",
     alt: "Campus student event discovery and ticketing platform UI",
     width: 1672,
     height: 941,
@@ -130,7 +130,7 @@ const rawProjects: RawProject[] = [
     title: "Air Quality Monitor",
     category: "Embedded Systems",
     tech: ["ESP32", "MQ135", "OLED"],
-    image: "/images/project-air-quality.webp",
+    image: "/images/projects/project-air-quality.webp",
     alt: "Air quality particulate sensor workbench prototype",
     width: 1672,
     height: 941,
@@ -140,7 +140,7 @@ const rawProjects: RawProject[] = [
     title: "Solar Power Tracker",
     category: "Hardware",
     tech: ["Arduino", "LDR", "Servo"],
-    image: "/images/project-solar-tracker.webp",
+    image: "/images/projects/project-solar-tracker.webp",
     alt: "Dual-axis solar tracking panel with servos and light sensors",
     width: 1672,
     height: 941,
@@ -150,7 +150,7 @@ const rawProjects: RawProject[] = [
     title: "Learning Resource Hub",
     category: "Front-End",
     tech: ["React", "TypeScript"],
-    image: "/images/project-learning-hub.webp",
+    image: "/images/projects/project-learning-hub.webp",
     alt: "Educational digital study material repository and learning hub UI",
     width: 1672,
     height: 941,
@@ -162,8 +162,8 @@ export const projects: ProjectItem[] = rawProjects.map((project, index) => ({
   ...project,
   id: String(index + 1),
   slug: project.title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-"),
-  width: project.width ?? 1672,
-  height: project.height ?? 941,
+  width: project.width,
+  height: project.height,
   summary:
     project.summary ??
     "A hands-on student concept exploring thoughtful engineering, practical problem-solving, and accessible technology.",
