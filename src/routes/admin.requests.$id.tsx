@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Calendar,
@@ -22,6 +22,9 @@ import {
   CircleDollarSign,
   CheckCircle2,
   HelpCircle,
+  Receipt,
+  Plus,
+  ArrowUpRight,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -30,6 +33,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
 import {
   Select,
   SelectTrigger,
@@ -116,6 +127,71 @@ const STATUS_BADGES: Record<string, { label: string; className: string }> = {
     className: "bg-muted text-muted-foreground border-border",
   },
 };
+
+interface QuoteSummary {
+  id: string;
+  quote_number: string;
+  status: string;
+  total: number | null;
+  currency: string | null;
+  created_at: string;
+}
+
+const QUOTE_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+  draft: {
+    label: "Draft",
+    className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  },
+  sent: {
+    label: "Sent",
+    className: "bg-royal/10 text-royal dark:text-glow border-royal/20",
+  },
+  accepted: {
+    label: "Accepted",
+    className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+  },
+  approved: {
+    label: "Accepted",
+    className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+  },
+  declined: {
+    label: "Declined",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+  },
+  rejected: {
+    label: "Declined",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+  },
+};
+
+function QuoteStatusBadge({ status }: { status?: string | null }) {
+  const s = (status || "draft").toLowerCase();
+  const config = QUOTE_STATUS_CONFIG[s] ?? {
+    label: status ? status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ") : "Draft",
+    className: "bg-muted text-muted-foreground border-border",
+  };
+  return (
+    <Badge
+      variant="outline"
+      className={cn("text-[11px] font-semibold px-2 py-0.5 capitalize", config.className)}
+    >
+      {config.label}
+    </Badge>
+  );
+}
+
+function formatMoney(amount: number | null | undefined, currency = "INR") {
+  if (amount === null || amount === undefined) return "—";
+  try {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: currency || "INR",
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `₹${amount.toFixed(2)}`;
+  }
+}
 
 function formatDateTime(iso?: string | null) {
   if (!iso) return "—";
@@ -219,6 +295,7 @@ function renderJsonbRows(raw: unknown) {
 
 function AdminRequestDetailPage() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);
@@ -226,11 +303,40 @@ function AdminRequestDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [request, setRequest] = useState<RequestRecord | null>(null);
 
+  // Quotes state
+  const [quotes, setQuotes] = useState<QuoteSummary[]>([]);
+  const [quotesLoading, setQuotesLoading] = useState(true);
+  const [quotesError, setQuotesError] = useState<string | null>(null);
+  const [creatingQuote, setCreatingQuote] = useState(false);
+
   // Actions local state
   const [internalNotes, setInternalNotes] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
+
+  const fetchQuotes = useCallback(async () => {
+    setQuotesLoading(true);
+    setQuotesError(null);
+    try {
+      const { data, error: qError } = await supabase
+        .from("quotes")
+        .select("id, quote_number, status, total, currency, created_at")
+        .eq("request_id", id)
+        .order("created_at", { ascending: false });
+
+      if (qError) {
+        throw new Error(qError.message);
+      }
+
+      setQuotes((data as QuoteSummary[]) || []);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load quotes.";
+      setQuotesError(msg);
+    } finally {
+      setQuotesLoading(false);
+    }
+  }, [id]);
 
   const fetchRequest = useCallback(async () => {
     setLoading(true);
@@ -265,7 +371,44 @@ function AdminRequestDetailPage() {
 
   useEffect(() => {
     void fetchRequest();
-  }, [fetchRequest]);
+    void fetchQuotes();
+  }, [fetchRequest, fetchQuotes]);
+
+  // Create Quote Handler
+  async function handleCreateQuote() {
+    if (!user?.id) {
+      toast.error("You must be logged in as an admin to create quotes.");
+      return;
+    }
+    setCreatingQuote(true);
+    try {
+      const { data, error: insertError } = await supabase
+        .from("quotes")
+        .insert({
+          request_id: id,
+          created_by: user.id,
+        })
+        .select("id")
+        .single();
+
+      if (insertError) {
+        throw new Error(insertError.message);
+      }
+
+      if (data?.id) {
+        toast.success("Quote created successfully");
+        void navigate({
+          to: "/admin/quotes/$id",
+          params: { id: data.id },
+        });
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to create quote.";
+      toast.error(msg);
+    } finally {
+      setCreatingQuote(false);
+    }
+  }
 
   // Status Change Handler
   async function handleStatusChange(newStatus: string) {
@@ -502,11 +645,14 @@ function AdminRequestDetailPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => void fetchRequest()}
-            disabled={loading}
+            onClick={() => {
+              void fetchRequest();
+              void fetchQuotes();
+            }}
+            disabled={loading || quotesLoading}
             className="gap-2 text-xs h-8"
           >
-            <RefreshCw className={cn("size-3.5", loading && "animate-spin")} />
+            <RefreshCw className={cn("size-3.5", (loading || quotesLoading) && "animate-spin")} />
             <span>Refresh</span>
           </Button>
         </div>
@@ -680,6 +826,135 @@ function AdminRequestDetailPage() {
                   {projectIdea}
                 </p>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Quotes Card */}
+          <Card className="border-border bg-card shadow-xs">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-royal/10 text-royal dark:text-glow">
+                  <Receipt className="size-4" />
+                </div>
+                <div>
+                  <CardTitle className="text-base font-semibold">Quotes</CardTitle>
+                  <CardDescription className="text-xs">
+                    Milestone breakdowns, pricing estimates, and customer approval status
+                  </CardDescription>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => void handleCreateQuote()}
+                disabled={creatingQuote}
+                className="gap-1.5 text-xs h-8 bg-brand-gradient text-white hover:opacity-90 self-start sm:self-auto"
+              >
+                {creatingQuote ? (
+                  <LoaderCircle className="size-3.5 animate-spin" />
+                ) : (
+                  <Plus className="size-3.5" />
+                )}
+                <span>{creatingQuote ? "Creating..." : "Create quote"}</span>
+              </Button>
+            </CardHeader>
+
+            <CardContent>
+              {/* Quotes Loading State */}
+              {quotesLoading && (
+                <div className="space-y-2 py-2">
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                </div>
+              )}
+
+              {/* Quotes Error State */}
+              {!quotesLoading && quotesError && (
+                <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center space-y-2">
+                  <p className="text-xs text-destructive">{quotesError}</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void fetchQuotes()}
+                    className="h-7 text-xs border-border gap-1.5"
+                  >
+                    <RefreshCw className="size-3" />
+                    Retry
+                  </Button>
+                </div>
+              )}
+
+              {/* Quotes Empty State */}
+              {!quotesLoading && !quotesError && quotes.length === 0 && (
+                <div className="rounded-xl border border-dashed border-border p-6 text-center">
+                  <Receipt className="size-8 text-muted-foreground/60 mx-auto mb-2" />
+                  <p className="text-xs font-medium text-foreground">No quotes created yet</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
+                    Generate an official milestone quote for this customer request.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void handleCreateQuote()}
+                    disabled={creatingQuote}
+                    className="h-8 text-xs gap-1.5 border-border"
+                  >
+                    <Plus className="size-3.5" />
+                    Create first quote
+                  </Button>
+                </div>
+              )}
+
+              {/* Quotes Table */}
+              {!quotesLoading && !quotesError && quotes.length > 0 && (
+                <div className="rounded-xl border border-border overflow-hidden">
+                  <Table>
+                    <TableHeader className="bg-muted/40">
+                      <TableRow className="border-b border-border text-[11px]">
+                        <TableHead className="font-semibold text-xs py-2.5">Quote Number</TableHead>
+                        <TableHead className="font-semibold text-xs py-2.5">Status</TableHead>
+                        <TableHead className="font-semibold text-xs py-2.5 text-right">
+                          Total
+                        </TableHead>
+                        <TableHead className="font-semibold text-xs py-2.5 text-right pr-4">
+                          Action
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {quotes.map((q) => (
+                        <TableRow key={q.id} className="border-b border-border hover:bg-muted/20">
+                          <TableCell className="font-mono font-semibold text-xs py-3 text-foreground">
+                            {q.quote_number}
+                          </TableCell>
+                          <TableCell className="py-3">
+                            <QuoteStatusBadge status={q.status} />
+                          </TableCell>
+                          <TableCell className="font-mono text-xs font-bold text-foreground text-right py-3">
+                            {formatMoney(q.total, q.currency || "INR")}
+                          </TableCell>
+                          <TableCell className="text-right py-3 pr-4">
+                            <Button
+                              asChild
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs border-border px-2.5 gap-1"
+                            >
+                              <Link to="/admin/quotes/$id" params={{ id: q.id }}>
+                                <span>Open</span>
+                                <ArrowUpRight className="size-3" />
+                              </Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
 

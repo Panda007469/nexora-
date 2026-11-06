@@ -21,6 +21,8 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
+import { Route as QuoteTokenRouteImport } from './routes/quote.$token'
+import { Route as AdminQuotesIdRouteImport } from './routes/admin.quotes.$id'
 import { Route as AdminRequestsIndexRouteImport } from './routes/admin.requests.index'
 import { Route as AdminRequestsIdRouteImport } from './routes/admin.requests.$id'
 
@@ -84,6 +86,16 @@ const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ProjectsRoute,
 } as any)
+const QuoteTokenRoute = QuoteTokenRouteImport.update({
+  id: '/quote/$token',
+  path: '/quote/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQuotesIdRoute = AdminQuotesIdRouteImport.update({
+  id: '/quotes/$id',
+  path: '/quotes/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRequestsIndexRoute = AdminRequestsIndexRouteImport.update({
   id: '/requests/',
   path: '/requests/',
@@ -106,8 +118,10 @@ export interface FileRoutesByFullPath {
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/quote/$token': typeof QuoteTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/admin/requests/$id': typeof AdminRequestsIdRoute
   '/admin/requests/': typeof AdminRequestsIndexRoute
 }
@@ -120,8 +134,10 @@ export interface FileRoutesByTo {
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/quote/$token': typeof QuoteTokenRoute
   '/admin': typeof AdminIndexRoute
   '/projects': typeof ProjectsIndexRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/admin/requests/$id': typeof AdminRequestsIdRoute
   '/admin/requests': typeof AdminRequestsIndexRoute
 }
@@ -137,8 +153,10 @@ export interface FileRoutesById {
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/quote/$token': typeof QuoteTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/admin/requests/$id': typeof AdminRequestsIdRoute
   '/admin/requests/': typeof AdminRequestsIndexRoute
 }
@@ -155,8 +173,10 @@ export interface FileRouteTypes {
     | '/request'
     | '/services'
     | '/projects/$slug'
+    | '/quote/$token'
     | '/admin/'
     | '/projects/'
+    | '/admin/quotes/$id'
     | '/admin/requests/$id'
     | '/admin/requests/'
   fileRoutesByTo: FileRoutesByTo
@@ -169,8 +189,10 @@ export interface FileRouteTypes {
     | '/request'
     | '/services'
     | '/projects/$slug'
+    | '/quote/$token'
     | '/admin'
     | '/projects'
+    | '/admin/quotes/$id'
     | '/admin/requests/$id'
     | '/admin/requests'
   id:
@@ -185,8 +207,10 @@ export interface FileRouteTypes {
     | '/request'
     | '/services'
     | '/projects/$slug'
+    | '/quote/$token'
     | '/admin/'
     | '/projects/'
+    | '/admin/quotes/$id'
     | '/admin/requests/$id'
     | '/admin/requests/'
   fileRoutesById: FileRoutesById
@@ -201,6 +225,7 @@ export interface RootRouteChildren {
   ProjectsRoute: typeof ProjectsRouteWithChildren
   RequestRoute: typeof RequestRoute
   ServicesRoute: typeof ServicesRoute
+  QuoteTokenRoute: typeof QuoteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -289,6 +314,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsSlugRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/quote/$token': {
+      id: '/quote/$token'
+      path: '/quote/$token'
+      fullPath: '/quote/$token'
+      preLoaderRoute: typeof QuoteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/quotes/$id': {
+      id: '/admin/quotes/$id'
+      path: '/quotes/$id'
+      fullPath: '/admin/quotes/$id'
+      preLoaderRoute: typeof AdminQuotesIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/requests/': {
       id: '/admin/requests/'
       path: '/requests'
@@ -308,12 +347,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   AdminRequestsIdRoute: typeof AdminRequestsIdRoute
   AdminRequestsIndexRoute: typeof AdminRequestsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
+  AdminQuotesIdRoute: AdminQuotesIdRoute,
   AdminRequestsIdRoute: AdminRequestsIdRoute,
   AdminRequestsIndexRoute: AdminRequestsIndexRoute,
 }
@@ -344,6 +385,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjectsRoute: ProjectsRouteWithChildren,
   RequestRoute: RequestRoute,
   ServicesRoute: ServicesRoute,
+  QuoteTokenRoute: QuoteTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
