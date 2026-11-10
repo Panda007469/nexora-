@@ -208,9 +208,7 @@ export function SiteFooter() {
                     <Send size={13} />
                   </Button>
                 </div>
-                <span className="text-[10px] text-white/50">
-                  We respect your privacy.
-                </span>
+                <span className="text-[10px] text-white/50">We respect your privacy.</span>
               </form>
             )}
           </div>

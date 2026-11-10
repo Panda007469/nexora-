@@ -10,3 +10,9 @@ export function whatsappUrl(phone: string, message = ""): string | null {
   if (!n) return null;
   return `https://wa.me/${n}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 }
+
+export function formatPhone(n: string): string {
+  const d = n.replace(/\D/g, "");
+  if (d.length === 12 && d.startsWith("91")) return `+91 ${d.slice(2, 7)} ${d.slice(7)}`;
+  return d ? `+${d}` : "";
+}

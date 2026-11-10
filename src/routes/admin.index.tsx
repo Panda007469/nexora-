@@ -17,7 +17,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { whatsappUrl, formatPhone } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -497,15 +497,26 @@ function AdminDashboard() {
                         <td className="py-3.5 px-4 text-muted-foreground">{email}</td>
                         <td className="py-3.5 px-4">
                           {wa ? (
-                            <a
-                              href={wa}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-md bg-[#25D366] px-2.5 py-1 text-xs font-medium text-white hover:opacity-90 transition-opacity"
-                            >
-                              <MessageCircle className="size-3.5" />
-                              <span>WhatsApp</span>
-                            </a>
+                            <div className="flex flex-col items-start gap-1">
+                              {row.phone && formatPhone(row.phone) && (
+                                <span className="font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                                  {formatPhone(row.phone)}
+                                </span>
+                              )}
+                              <a
+                                href={wa}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-md bg-[#25D366] px-2.5 py-1 text-xs font-medium text-white hover:opacity-90 transition-opacity"
+                              >
+                                <MessageCircle className="size-3.5" />
+                                <span>WhatsApp</span>
+                              </a>
+                            </div>
+                          ) : row.phone && formatPhone(row.phone) ? (
+                            <span className="font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                              {formatPhone(row.phone)}
+                            </span>
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}

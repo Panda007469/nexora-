@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { whatsappUrl, formatPhone } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -413,6 +413,11 @@ function AdminRequestsPage() {
                         <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[200px]">
                           {row.email || "No email"}
                         </div>
+                        {row.phone && formatPhone(row.phone) && (
+                          <div className="text-xs text-muted-foreground mt-0.5 font-mono">
+                            {formatPhone(row.phone)}
+                          </div>
+                        )}
                       </TableCell>
 
                       {/* Service */}

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { whatsappUrl, formatPhone } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -136,9 +136,7 @@ function AdminMessagesPage() {
         return;
       }
 
-      setMessages((prev) =>
-        prev.map((m) => (m.id === id ? { ...m, status: "read" } : m)),
-      );
+      setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, status: "read" } : m)));
       toast.success("Message marked as read");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not update message status.";
@@ -222,9 +220,7 @@ function AdminMessagesPage() {
           <div className="size-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground mb-3">
             <Inbox className="size-6" />
           </div>
-          <h2 className="font-heading text-base font-bold text-foreground mb-1">
-            No messages yet
-          </h2>
+          <h2 className="font-heading text-base font-bold text-foreground mb-1">No messages yet</h2>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-sm">
             Inquiries submitted through the public Contact page will appear here.
           </p>
@@ -270,7 +266,7 @@ function AdminMessagesPage() {
                       {msg.phone && (
                         <span className="inline-flex items-center gap-1.5 text-foreground/80">
                           <Phone className="size-3.5 shrink-0 text-muted-foreground" />
-                          {msg.phone}
+                          {formatPhone(msg.phone) || msg.phone}
                         </span>
                       )}
 
@@ -329,4 +325,3 @@ function AdminMessagesPage() {
     </div>
   );
 }
-

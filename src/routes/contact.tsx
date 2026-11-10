@@ -30,10 +30,9 @@ const contactFormSchema = z.object({
   phone: z
     .string()
     .trim()
-    .refine(
-      (v) => v === "" || normalizeWhatsApp(v) !== null,
-      { message: "Enter a valid WhatsApp number, or leave blank." },
-    ),
+    .refine((v) => v === "" || normalizeWhatsApp(v) !== null, {
+      message: "Enter a valid WhatsApp number, or leave blank.",
+    }),
   message: z
     .string()
     .trim()
@@ -211,7 +210,8 @@ function ContactPage() {
                       {contact.workingHours}
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Active workbench hours for scheduled live design reviews and code walkthroughs.
+                      Active workbench hours for scheduled live design reviews and code
+                      walkthroughs.
                     </p>
                   </div>
                 </div>
@@ -371,7 +371,9 @@ function ContactPage() {
                             : "border-border focus:border-royal focus:ring-royal/30"
                         } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all`}
                         aria-invalid={!!errors.phone}
-                        aria-describedby={errors.phone ? "contact-phone-error" : "contact-phone-desc"}
+                        aria-describedby={
+                          errors.phone ? "contact-phone-error" : "contact-phone-desc"
+                        }
                       />
                       <p id="contact-phone-desc" className="text-[11px] text-muted-foreground mt-1">
                         We may contact you on WhatsApp if you provide a number.
@@ -408,7 +410,10 @@ function ContactPage() {
                         aria-invalid={!!errors.message}
                         aria-describedby={errors.message ? "message-error" : "message-desc"}
                       />
-                      <p id="message-desc" className="text-[11px] text-muted-foreground mt-1 text-right">
+                      <p
+                        id="message-desc"
+                        className="text-[11px] text-muted-foreground mt-1 text-right"
+                      >
                         {messageValue.length} / 4000
                       </p>
                       {errors.message && (

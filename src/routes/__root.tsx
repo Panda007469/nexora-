@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -151,16 +152,22 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const isAdminRoute = pathname.startsWith("/admin");
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <SiteHeader />
+      {!isAdminRoute && <SiteHeader />}
       <Outlet />
-      <CtaBanner />
-      <SiteFooter />
-      <WhatsAppButton />
-      <ScrollToTop />
+      {!isAdminRoute && (
+        <>
+          <CtaBanner />
+          <SiteFooter />
+          <WhatsAppButton />
+          <ScrollToTop />
+        </>
+      )}
       <Toaster />
     </QueryClientProvider>
   );

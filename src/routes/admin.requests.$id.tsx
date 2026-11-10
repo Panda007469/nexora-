@@ -27,7 +27,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { whatsappUrl, formatPhone } from "@/lib/whatsapp";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -567,7 +567,7 @@ function AdminRequestDetailPage() {
     request.request_code || request.code || `REQ-${request.id.slice(0, 8).toUpperCase()}`;
   const contactName = request.name || request.student_name || "—";
   const contactEmail = request.email || "—";
-  const contactPhone = request.phone || "—";
+  const contactPhone = request.phone ? formatPhone(request.phone) || request.phone : "—";
   const contactOrg = request.org || request.college || "—";
   const contactCity = request.city || "—";
   const contactType = request.customer_type || "—";
