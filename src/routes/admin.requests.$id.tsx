@@ -27,6 +27,9 @@ import {
   ArrowUpRight,
   Copy,
   Check,
+  ListChecks,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { whatsappUrl, formatPhone } from "@/lib/whatsapp";
@@ -51,7 +54,28 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { meta } from "@/components/nexora/shared";
 import { cn } from "@/lib/utils";
 
@@ -139,6 +163,37 @@ interface QuoteSummary {
   currency: string | null;
   created_at: string;
 }
+
+interface RequirementRecord {
+  id: string;
+  request_id: string;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  priority: "must" | "should" | "could";
+  created_at?: string | null;
+}
+
+const REQUIREMENT_PRIORITY_CONFIG: Record<
+  "must" | "should" | "could",
+  { label: string; badgeLabel: string; className: string }
+> = {
+  must: {
+    label: "Must have (Critical)",
+    badgeLabel: "Must have",
+    className: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+  },
+  should: {
+    label: "Should have (Important)",
+    badgeLabel: "Should have",
+    className: "bg-royal/10 text-royal dark:text-glow border-royal/20",
+  },
+  could: {
+    label: "Could have (Nice to have)",
+    badgeLabel: "Could have",
+    className: "bg-muted text-muted-foreground border-border",
+  },
+};
 
 const QUOTE_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   draft: {
@@ -312,12 +367,50 @@ function AdminRequestDetailPage() {
   const [quotesError, setQuotesError] = useState<string | null>(null);
   const [creatingQuote, setCreatingQuote] = useState(false);
 
+  // Requirements state
+  const [requirements, setRequirements] = useState<RequirementRecord[]>([]);
+  const [reqsLoading, setReqsLoading] = useState(true);
+  const [reqsError, setReqsError] = useState<string | null>(null);
+
+  // Requirement dialog & form state
+  const [reqDialogOpen, setReqDialogOpen] = useState(false);
+  const [editingReq, setEditingReq] = useState<RequirementRecord | null>(null);
+  const [reqTitle, setReqTitle] = useState("");
+  const [reqDesc, setReqDesc] = useState("");
+  const [reqCategory, setReqCategory] = useState("");
+  const [reqPriority, setReqPriority] = useState<"must" | "should" | "could">("must");
+  const [savingReq, setSavingReq] = useState(false);
+  const [deletingReqId, setDeletingReqId] = useState<string | null>(null);
+
   // Actions local state
   const [internalNotes, setInternalNotes] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
   const [copiedTrackingLink, setCopiedTrackingLink] = useState(false);
+
+  const fetchRequirements = useCallback(async () => {
+    setReqsLoading(true);
+    setReqsError(null);
+    try {
+      const { data, error: rError } = await supabase
+        .from("requirements")
+        .select("*")
+        .eq("request_id", id)
+        .order("created_at", { ascending: true });
+
+      if (rError) {
+        throw new Error(rError.message);
+      }
+
+      setRequirements((data as RequirementRecord[]) || []);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load requirements.";
+      setReqsError(msg);
+    } finally {
+      setReqsLoading(false);
+    }
+  }, [id]);
 
   const fetchQuotes = useCallback(async () => {
     setQuotesLoading(true);
@@ -376,7 +469,8 @@ function AdminRequestDetailPage() {
   useEffect(() => {
     void fetchRequest();
     void fetchQuotes();
-  }, [fetchRequest, fetchQuotes]);
+    void fetchRequirements();
+  }, [fetchRequest, fetchQuotes, fetchRequirements]);
 
   // Create Quote Handler
   async function handleCreateQuote() {
@@ -390,7 +484,6 @@ function AdminRequestDetailPage() {
         .from("quotes")
         .insert({
           request_id: id,
-          created_by: user.id,
         })
         .select("id")
         .single();
@@ -411,6 +504,94 @@ function AdminRequestDetailPage() {
       toast.error(msg);
     } finally {
       setCreatingQuote(false);
+    }
+  }
+
+  function handleOpenAddReq() {
+    setEditingReq(null);
+    setReqTitle("");
+    setReqDesc("");
+    setReqCategory("");
+    setReqPriority("must");
+    setReqDialogOpen(true);
+  }
+
+  function handleOpenEditReq(reqItem: RequirementRecord) {
+    setEditingReq(reqItem);
+    setReqTitle(reqItem.title);
+    setReqDesc(reqItem.description ?? "");
+    setReqCategory(reqItem.category ?? "");
+    setReqPriority(reqItem.priority || "must");
+    setReqDialogOpen(true);
+  }
+
+  async function handleSaveRequirement(e: React.FormEvent) {
+    e.preventDefault();
+    if (!reqTitle.trim()) {
+      toast.error("Requirement title is required");
+      return;
+    }
+
+    setSavingReq(true);
+    try {
+      if (editingReq) {
+        const { error: updateErr } = await supabase
+          .from("requirements")
+          .update({
+            title: reqTitle.trim(),
+            description: reqDesc.trim() || null,
+            category: reqCategory.trim() || null,
+            priority: reqPriority,
+          })
+          .eq("id", editingReq.id);
+
+        if (updateErr) {
+          throw new Error(updateErr.message);
+        }
+        toast.success("Requirement updated successfully");
+      } else {
+        const { error: insertErr } = await supabase.from("requirements").insert({
+          request_id: id,
+          title: reqTitle.trim(),
+          description: reqDesc.trim() || null,
+          category: reqCategory.trim() || null,
+          priority: reqPriority,
+        });
+
+        if (insertErr) {
+          throw new Error(insertErr.message);
+        }
+        toast.success("Requirement added successfully");
+      }
+
+      setReqDialogOpen(false);
+      await fetchRequirements();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to save requirement.";
+      toast.error(msg);
+    } finally {
+      setSavingReq(false);
+    }
+  }
+
+  async function handleDeleteRequirement(reqId: string) {
+    setDeletingReqId(reqId);
+    try {
+      const { error: delErr } = await supabase
+        .from("requirements")
+        .delete()
+        .eq("id", reqId);
+
+      if (delErr) {
+        throw new Error(delErr.message);
+      }
+      toast.success("Requirement deleted");
+      await fetchRequirements();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to delete requirement.";
+      toast.error(msg);
+    } finally {
+      setDeletingReqId(null);
     }
   }
 
@@ -667,11 +848,17 @@ function AdminRequestDetailPage() {
             onClick={() => {
               void fetchRequest();
               void fetchQuotes();
+              void fetchRequirements();
             }}
-            disabled={loading || quotesLoading}
+            disabled={loading || quotesLoading || reqsLoading}
             className="gap-2 text-xs h-8"
           >
-            <RefreshCw className={cn("size-3.5", (loading || quotesLoading) && "animate-spin")} />
+            <RefreshCw
+              className={cn(
+                "size-3.5",
+                (loading || quotesLoading || reqsLoading) && "animate-spin",
+              )}
+            />
             <span>Refresh</span>
           </Button>
         </div>
@@ -679,9 +866,23 @@ function AdminRequestDetailPage() {
 
       {/* Two Column Layout: Main Details (Left 2 cols) & Actions (Right 1 col) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Contact, Project, Technical Details, Deliverables */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Contact Card */}
+        {/* Left Column: Tabbed Interface for Request Details and Requirements */}
+        <Tabs defaultValue="details" className="lg:col-span-2 space-y-6">
+          <TabsList className="bg-muted/60 p-1 w-full sm:w-auto grid grid-cols-2 sm:inline-flex">
+            <TabsTrigger value="details">Request Details</TabsTrigger>
+            <TabsTrigger value="requirements" className="gap-2">
+              <ListChecks className="size-3.5" />
+              <span>Requirements</span>
+              {requirements.length > 0 && (
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 ml-1">
+                  {requirements.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details" className="space-y-6 mt-0">
+            {/* Contact Card */}
           <Card className="border-border bg-card shadow-xs">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2">
@@ -1035,7 +1236,197 @@ function AdminRequestDetailPage() {
             </CardHeader>
             <CardContent>{renderJsonbRows(deliverablesData)}</CardContent>
           </Card>
-        </div>
+        </TabsContent>
+
+        {/* Requirements Tab Content */}
+        <TabsContent value="requirements" className="space-y-6 mt-0">
+          <Card className="border-border bg-card shadow-xs">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-brand-gradient text-white">
+                  <ListChecks className="size-4" />
+                </div>
+                <div>
+                  <CardTitle className="text-base font-semibold">
+                    Requirements Specification
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Customer requirements with MoSCoW prioritization
+                  </CardDescription>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleOpenAddReq}
+                className="gap-1.5 text-xs h-8 bg-brand-gradient text-white hover:opacity-90 self-start sm:self-auto"
+              >
+                <Plus className="size-3.5" />
+                <span>Add requirement</span>
+              </Button>
+            </CardHeader>
+
+            <CardContent>
+              {/* Requirements Loading State */}
+              {reqsLoading && (
+                <div className="space-y-2 py-2">
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                </div>
+              )}
+
+              {/* Requirements Error State */}
+              {!reqsLoading && reqsError && (
+                <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center space-y-2">
+                  <p className="text-xs text-destructive">{reqsError}</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void fetchRequirements()}
+                    className="h-7 text-xs border-border gap-1.5"
+                  >
+                    <RefreshCw className="size-3" />
+                    Retry
+                  </Button>
+                </div>
+              )}
+
+              {/* Requirements Empty State */}
+              {!reqsLoading && !reqsError && requirements.length === 0 && (
+                <div className="rounded-xl border border-dashed border-border p-8 text-center">
+                  <ListChecks className="size-8 text-muted-foreground/60 mx-auto mb-2" />
+                  <p className="text-xs font-medium text-foreground">No requirements recorded yet</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
+                    Break down this customer request into structured Must/Should/Could deliverables.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleOpenAddReq}
+                    className="h-8 text-xs gap-1.5 border-border"
+                  >
+                    <Plus className="size-3.5" />
+                    Add first requirement
+                  </Button>
+                </div>
+              )}
+
+              {/* Requirements Table */}
+              {!reqsLoading && !reqsError && requirements.length > 0 && (
+                <div className="rounded-xl border border-border overflow-hidden">
+                  <Table>
+                    <TableHeader className="bg-muted/40">
+                      <TableRow className="border-b border-border text-[11px]">
+                        <TableHead className="w-28 font-semibold text-xs py-2.5">Priority</TableHead>
+                        <TableHead className="font-semibold text-xs py-2.5">Title &amp; Category</TableHead>
+                        <TableHead className="hidden md:table-cell font-semibold text-xs py-2.5">Description</TableHead>
+                        <TableHead className="font-semibold text-xs py-2.5 text-right pr-4 w-24">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {requirements.map((r) => {
+                        const priorityCfg =
+                          REQUIREMENT_PRIORITY_CONFIG[r.priority] ??
+                          REQUIREMENT_PRIORITY_CONFIG.must;
+                        return (
+                          <TableRow key={r.id} className="border-b border-border hover:bg-muted/20">
+                            <TableCell className="py-3 align-top">
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  "text-[11px] font-semibold px-2 py-0.5",
+                                  priorityCfg.className,
+                                )}
+                              >
+                                {priorityCfg.badgeLabel}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="py-3 align-top">
+                              <div className="space-y-1">
+                                <div className="font-medium text-xs sm:text-sm text-foreground">
+                                  {r.title}
+                                </div>
+                                {r.category && (
+                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                                    {r.category}
+                                  </Badge>
+                                )}
+                                {r.description && (
+                                  <p className="text-xs text-muted-foreground md:hidden mt-1 whitespace-pre-wrap">
+                                    {r.description}
+                                  </p>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell py-3 align-top text-xs text-muted-foreground whitespace-pre-wrap max-w-xs">
+                              {r.description || (
+                                <span className="italic text-muted-foreground/60">—</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right py-3 pr-4 align-top">
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleOpenEditReq(r)}
+                                  className="size-7 text-muted-foreground hover:text-foreground"
+                                >
+                                  <Pencil className="size-3.5" />
+                                  <span className="sr-only">Edit requirement</span>
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      disabled={deletingReqId === r.id}
+                                      className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                    >
+                                      {deletingReqId === r.id ? (
+                                        <LoaderCircle className="size-3.5 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="size-3.5" />
+                                      )}
+                                      <span className="sr-only">Delete requirement</span>
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Requirement?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete &ldquo;{r.title}&rdquo;?
+                                        This cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => void handleDeleteRequirement(r.id)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
         {/* Right Column: Actions Card */}
         <div className="space-y-6">
@@ -1170,6 +1561,109 @@ function AdminRequestDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* Requirement Add / Edit Dialog */}
+      <Dialog open={reqDialogOpen} onOpenChange={setReqDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={(e) => void handleSaveRequirement(e)}>
+            <DialogHeader>
+              <DialogTitle>
+                {editingReq ? "Edit Requirement" : "Add Requirement"}
+              </DialogTitle>
+              <DialogDescription>
+                Specify the engineering deliverable, priority, and acceptance notes.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              {/* Title */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                  Title <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  value={reqTitle}
+                  onChange={(e) => setReqTitle(e.target.value)}
+                  placeholder="e.g. Low-power BLE telemetry at 1Hz"
+                  className="text-xs h-9"
+                  required
+                />
+              </div>
+
+              {/* Priority & Category in grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Priority Select */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Priority <span className="text-destructive">*</span>
+                  </label>
+                  <Select
+                    value={reqPriority}
+                    onValueChange={(val: "must" | "should" | "could") => setReqPriority(val)}
+                  >
+                    <SelectTrigger className="w-full text-xs h-9">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="must">Must have (Critical)</SelectItem>
+                      <SelectItem value="should">Should have (Important)</SelectItem>
+                      <SelectItem value="could">Could have (Nice to have)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Category */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Category (Optional)
+                  </label>
+                  <Input
+                    value={reqCategory}
+                    onChange={(e) => setReqCategory(e.target.value)}
+                    placeholder="e.g. Hardware, Firmware, UI"
+                    className="text-xs h-9"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                  Description / Acceptance Criteria
+                </label>
+                <Textarea
+                  value={reqDesc}
+                  onChange={(e) => setReqDesc(e.target.value)}
+                  placeholder="Detailed specifications, voltage tolerance, timing constraints..."
+                  rows={4}
+                  className="text-xs leading-relaxed resize-y"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setReqDialogOpen(false)}
+                className="text-xs h-8 border-border"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={savingReq}
+                className="text-xs h-8 bg-brand-gradient text-white hover:opacity-90 gap-1.5"
+              >
+                {savingReq && <LoaderCircle className="size-3.5 animate-spin" />}
+                <span>{editingReq ? "Save changes" : "Add requirement"}</span>
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
