@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Mail,
@@ -13,6 +13,8 @@ import {
   Phone,
   MessageCircle,
 } from "lucide-react";
+import { z } from "zod";
+import { toast } from "sonner";
 import { Logo } from "@/components/layout/Logo";
 import {
   navigation,
@@ -25,14 +27,44 @@ import {
 } from "@/data/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
+
+const emailSchema = z.string().email("Please enter a valid email address.");
 
 export function SiteFooter() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [sending, setSending] = useState(false);
+  const honeypotRef = useRef<HTMLInputElement>(null);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !email.includes("@")) return;
+
+    // Honeypot check — bot filled the hidden field, fake success silently
+    if (honeypotRef.current?.value) {
+      setSubscribed(true);
+      setEmail("");
+      return;
+    }
+
+    const parsed = emailSchema.safeParse(email.trim());
+    if (!parsed.success) {
+      toast.error(parsed.error.errors[0]?.message ?? "Invalid email.");
+      return;
+    }
+
+    setSending(true);
+    const { error } = await supabase.rpc("subscribe_newsletter", {
+      e: parsed.data,
+    });
+    setSending(false);
+
+    if (error) {
+      toast.error("Could not subscribe", { description: error.message });
+      return;
+    }
+
+    toast.success("Thanks, you're subscribed!");
     setSubscribed(true);
     setEmail("");
   };
@@ -147,6 +179,16 @@ export function SiteFooter() {
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+                {/* Honeypot — hidden from humans, traps bots */}
+                <input
+                  ref={honeypotRef}
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  autoComplete="off"
+                  className="absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0 pointer-events-none"
+                />
                 <div className="relative">
                   <input
                     type="email"
@@ -159,14 +201,15 @@ export function SiteFooter() {
                   <Button
                     type="submit"
                     size="icon"
+                    disabled={sending}
                     aria-label="Subscribe to newsletter"
-                    className="absolute right-1 top-1 size-8 rounded bg-brand-gradient text-white hover:opacity-90 transition-opacity p-0"
+                    className="absolute right-1 top-1 size-8 rounded bg-brand-gradient text-white hover:opacity-90 transition-opacity p-0 disabled:opacity-50"
                   >
                     <Send size={13} />
                   </Button>
                 </div>
                 <span className="text-[10px] text-white/50">
-                  Browser-only preview. We respect your privacy.
+                  We respect your privacy.
                 </span>
               </form>
             )}

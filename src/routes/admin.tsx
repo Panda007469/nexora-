@@ -3,6 +3,7 @@ import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tansta
 import {
   LayoutDashboard,
   FileText,
+  MessageSquare,
   LogOut,
   LoaderCircle,
   Menu,
@@ -18,8 +19,16 @@ import { meta } from "@/components/nexora/shared";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
-  head: () =>
-    meta("Admin Portal", "Nexora internal administration portal and request management pipeline."),
+  head: () => {
+    const base = meta(
+      "Admin Portal",
+      "Nexora internal administration portal and request management pipeline.",
+    );
+    return {
+      ...base,
+      meta: [...base.meta, { name: "robots", content: "noindex, nofollow" }],
+    };
+  },
   component: AdminLayout,
 });
 
@@ -77,6 +86,12 @@ function AdminLayout() {
       to: "/admin/requests",
       icon: FileText,
       active: location.pathname.startsWith("/admin/requests"),
+    },
+    {
+      label: "Messages",
+      to: "/admin/messages",
+      icon: MessageSquare,
+      active: location.pathname.startsWith("/admin/messages"),
     },
   ];
 

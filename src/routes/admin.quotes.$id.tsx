@@ -278,6 +278,7 @@ function AdminQuoteEditorPage() {
     for (let i = 0; i < items.length; i++) {
       const cur = items[i];
       const saved = savedItems[i];
+      if (!cur || !saved) return true;
       if (cur.description.trim() !== (saved.description ?? "").trim()) return true;
       if (Number(cur.qty) !== Number(saved.qty)) return true;
       if (Number(cur.unit_price) !== Number(saved.unit_price)) return true;
@@ -301,7 +302,9 @@ function AdminQuoteEditorPage() {
   const updateItem = (index: number, field: keyof QuoteItemForm, val: string | number) => {
     setItems((prev) => {
       const copy = [...prev];
-      copy[index] = { ...copy[index], [field]: val };
+      const existing = copy[index];
+      if (!existing) return prev;
+      copy[index] = { ...existing, [field]: val };
       return copy;
     });
   };
@@ -505,14 +508,24 @@ function AdminQuoteEditorPage() {
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-8">
       {/* Top Bar: Back Link */}
       <div>
-        <Link
-          to={quote.request_id ? "/admin/requests/$id" : "/admin/requests"}
-          params={quote.request_id ? { id: quote.request_id } : undefined}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
-        >
-          <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
-          <span>Back to request</span>
-        </Link>
+        {quote.request_id ? (
+          <Link
+            to="/admin/requests/$id"
+            params={{ id: quote.request_id }}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
+          >
+            <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
+            <span>Back to request</span>
+          </Link>
+        ) : (
+          <Link
+            to="/admin/requests"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
+          >
+            <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
+            <span>Back to requests</span>
+          </Link>
+        )}
       </div>
 
       {/* Header: Quote Number, Status, Request link, Dates */}

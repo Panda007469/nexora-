@@ -301,7 +301,7 @@ function CustomerQuotePage() {
   const customerNote = quote?.customer_note || quote?.note || null;
 
   // Expiration check
-  const todayIso = new Date().toISOString().split("T")[0];
+  const todayIso = new Date().toISOString().split("T")[0] ?? "";
   const isExpired = Boolean(
     status === "expired" || (validUntil && validUntil.slice(0, 10) < todayIso && status === "sent"),
   );

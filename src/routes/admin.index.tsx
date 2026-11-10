@@ -156,7 +156,7 @@ const STATUS_BADGES: Record<string, { label: string; className: string }> = {
   },
 };
 
-function StatusBadge({ status }: { status?: string | null }) {
+function StatusBadge({ status }: { status?: string | null | undefined }) {
   const s = (status || "new").toLowerCase();
   const config = STATUS_BADGES[s] ?? {
     label: status ? status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ") : "New",

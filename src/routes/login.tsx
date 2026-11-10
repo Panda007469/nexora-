@@ -25,8 +25,16 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const Route = createFileRoute("/login")({
-  head: () =>
-    meta("Log In", "Sign in to access the Nexora administration portal and member dashboard."),
+  head: () => {
+    const base = meta(
+      "Log In",
+      "Sign in to access the Nexora administration portal and member dashboard.",
+    );
+    return {
+      ...base,
+      meta: [...base.meta, { name: "robots", content: "noindex, nofollow" }],
+    };
+  },
   component: Login,
 });
 

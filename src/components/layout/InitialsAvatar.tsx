@@ -2,7 +2,7 @@ import { useState } from "react";
 
 interface InitialsAvatarProps {
   name: string;
-  photo?: string;
+  photo?: string | undefined;
   size?: "sm" | "md" | "lg";
   className?: string;
 }

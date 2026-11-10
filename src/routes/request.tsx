@@ -130,7 +130,7 @@ function Request() {
     deadline: "",
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof values, string>>>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [trackingCode, setTrackingCode] = useState("");
   const [trackingToken, setTrackingToken] = useState("");
@@ -159,9 +159,10 @@ function Request() {
         phone: values.phone,
       });
       if (!result.success) {
-        const nextErrors: Record<string, string> = {};
+        const nextErrors: Partial<Record<keyof typeof values, string>> = {};
         result.error.issues.forEach((issue) => {
-          nextErrors[String(issue.path[0])] = issue.message;
+          const field = issue.path[0] as keyof typeof values | undefined;
+          if (field) nextErrors[field] = issue.message;
         });
         setErrors(nextErrors);
         return;
@@ -172,9 +173,10 @@ function Request() {
         deadline: values.deadline,
       });
       if (!result.success) {
-        const nextErrors: Record<string, string> = {};
+        const nextErrors: Partial<Record<keyof typeof values, string>> = {};
         result.error.issues.forEach((issue) => {
-          nextErrors[String(issue.path[0])] = issue.message;
+          const field = issue.path[0] as keyof typeof values | undefined;
+          if (field) nextErrors[field] = issue.message;
         });
         setErrors(nextErrors);
         return;
@@ -184,9 +186,10 @@ function Request() {
         description: values.description,
       });
       if (!result.success) {
-        const nextErrors: Record<string, string> = {};
+        const nextErrors: Partial<Record<keyof typeof values, string>> = {};
         result.error.issues.forEach((issue) => {
-          nextErrors[String(issue.path[0])] = issue.message;
+          const field = issue.path[0] as keyof typeof values | undefined;
+          if (field) nextErrors[field] = issue.message;
         });
         setErrors(nextErrors);
         return;
@@ -206,9 +209,10 @@ function Request() {
     event.preventDefault();
     const result = requestSchema.safeParse(values);
     if (!result.success) {
-      const next: Record<string, string> = {};
+      const next: Partial<Record<keyof typeof values, string>> = {};
       result.error.issues.forEach((issue) => {
-        next[String(issue.path[0])] = issue.message;
+        const field = issue.path[0] as keyof typeof values | undefined;
+        if (field) next[field] = issue.message;
       });
       setErrors(next);
 
@@ -272,7 +276,7 @@ function Request() {
                   <div className="flex items-center justify-between text-xs font-bold font-display uppercase tracking-wider text-muted-foreground mb-3">
                     <span>
                       Step {currentStep + 1} of {STEPS.length}:{" "}
-                      <span className="text-foreground">{STEPS[currentStep].label}</span>
+                      <span className="text-foreground">{STEPS[currentStep]?.label}</span>
                     </span>
                     <span className="text-royal dark:text-glow">
                       {Math.round(((currentStep + 1) / STEPS.length) * 100)}% Complete

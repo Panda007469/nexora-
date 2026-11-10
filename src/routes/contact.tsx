@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import { contact, phoneDisplay, whatsappNumber } from "@/data/site";
 import { whatsappUrl, normalizeWhatsApp } from "@/lib/whatsapp";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FadeUp } from "@/components/layout/FadeUp";
@@ -25,11 +26,19 @@ import { meta } from "@/components/nexora/shared";
 const contactFormSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name (at least 2 characters)."),
   email: z.string().trim().email("Please enter a valid email address."),
+  // Optional phone — empty string is fine; if provided must be a valid WhatsApp number
   phone: z
     .string()
     .trim()
-    .refine((v) => normalizeWhatsApp(v) !== null, { message: "Enter a valid WhatsApp number" }),
-  message: z.string().trim().min(10, "Please enter a message with at least 10 characters."),
+    .refine(
+      (v) => v === "" || normalizeWhatsApp(v) !== null,
+      { message: "Enter a valid WhatsApp number, or leave blank." },
+    ),
+  message: z
+    .string()
+    .trim()
+    .min(5, "Please enter a message with at least 5 characters.")
+    .max(4000, "Message must be 4000 characters or fewer."),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -47,10 +56,14 @@ function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Honeypot ref — not part of RHF schema
+  const honeypotRef = useRef<HTMLInputElement>(null);
+
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -62,17 +75,46 @@ function ContactPage() {
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
+  const messageValue = watch("message") ?? "";
+
+  const onSubmit = async (data: ContactFormValues) => {
+    // Honeypot: if the hidden field has a value a bot filled it in — fake success silently
+    if (honeypotRef.current?.value) {
+      setSubmitted(true);
+      reset();
+      return;
+    }
+
     setIsSubmitting(true);
-    // Browser-only simulated submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const phone = data.phone?.trim() ?? "";
+      const normalizedPhone = phone ? (normalizeWhatsApp(phone) ?? phone) : "";
+
+      const { error } = await supabase.rpc("submit_contact", {
+        p: {
+          name: data.name,
+          email: data.email,
+          phone: normalizedPhone,
+          message: data.message,
+        },
+      });
+
+      if (error) {
+        toast.error("Failed to send message", { description: error.message });
+        return;
+      }
+
       setSubmitted(true);
       reset();
       toast.success("Message sent successfully!", {
-        description: `Thank you, ${data.name}. We have received your note and will reply to ${data.email} within 24 hours.`,
+        description: `Thank you, ${data.name}. We'll get back to you at ${data.email} shortly.`,
       });
-    }, 600);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
+      toast.error("Failed to send message", { description: msg });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -169,8 +211,7 @@ function ContactPage() {
                       {contact.workingHours}
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Active workbench hours for scheduled live design reviews and code
-                      walkthroughs.
+                      Active workbench hours for scheduled live design reviews and code walkthroughs.
                     </p>
                   </div>
                 </div>
@@ -200,7 +241,7 @@ function ContactPage() {
             </FadeUp>
           </div>
 
-          {/* Right Column: Contact Form with Zod & React Hook Form */}
+          {/* Right Column: Contact Form */}
           <div className="lg:col-span-7">
             <FadeUp delay={0.1}>
               <div className="rounded-3xl border border-border bg-card p-7 sm:p-10 shadow-lg relative overflow-hidden">
@@ -236,6 +277,17 @@ function ContactPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+                    {/* Honeypot — hidden from real users, filled only by bots */}
+                    <input
+                      ref={honeypotRef}
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      autoComplete="off"
+                      className="absolute -left-[9999px] -top-[9999px] opacity-0 pointer-events-none"
+                    />
+
                     {/* Name Field */}
                     <div>
                       <label
@@ -294,13 +346,16 @@ function ContactPage() {
                       )}
                     </div>
 
-                    {/* WhatsApp Phone Field */}
+                    {/* Optional Phone / WhatsApp Field */}
                     <div>
                       <label
                         htmlFor="contact-phone"
                         className="block text-xs font-bold font-display uppercase tracking-wider text-foreground mb-2"
                       >
-                        WhatsApp number <span className="text-magenta">*</span>
+                        Phone / WhatsApp{" "}
+                        <span className="text-muted-foreground font-normal normal-case tracking-normal">
+                          (optional)
+                        </span>
                       </label>
                       <input
                         id="contact-phone"
@@ -316,12 +371,10 @@ function ContactPage() {
                             : "border-border focus:border-royal focus:ring-royal/30"
                         } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all`}
                         aria-invalid={!!errors.phone}
-                        aria-describedby={
-                          errors.phone ? "contact-phone-error" : "contact-phone-desc"
-                        }
+                        aria-describedby={errors.phone ? "contact-phone-error" : "contact-phone-desc"}
                       />
                       <p id="contact-phone-desc" className="text-[11px] text-muted-foreground mt-1">
-                        We'll contact you on this number via WhatsApp.
+                        We may contact you on WhatsApp if you provide a number.
                       </p>
                       {errors.phone && (
                         <p
@@ -353,8 +406,11 @@ function ContactPage() {
                             : "border-border focus:border-royal focus:ring-royal/30"
                         } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all resize-y`}
                         aria-invalid={!!errors.message}
-                        aria-describedby={errors.message ? "message-error" : undefined}
+                        aria-describedby={errors.message ? "message-error" : "message-desc"}
                       />
+                      <p id="message-desc" className="text-[11px] text-muted-foreground mt-1 text-right">
+                        {messageValue.length} / 4000
+                      </p>
                       {errors.message && (
                         <p
                           id="message-error"

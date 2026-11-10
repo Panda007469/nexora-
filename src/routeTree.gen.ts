@@ -19,6 +19,7 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
 import { Route as QuoteTokenRouteImport } from './routes/quote.$token'
@@ -76,6 +77,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRouteWithChildren
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/admin/': typeof AdminIndexRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/admin': typeof AdminIndexRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRouteWithChildren
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/admin/': typeof AdminIndexRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/request'
     | '/services'
+    | '/admin/messages'
     | '/projects/$slug'
     | '/quote/$token'
     | '/admin/'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/request'
     | '/services'
+    | '/admin/messages'
     | '/projects/$slug'
     | '/quote/$token'
     | '/admin'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/request'
     | '/services'
+    | '/admin/messages'
     | '/projects/$slug'
     | '/quote/$token'
     | '/admin/'
@@ -300,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/projects/': {
       id: '/projects/'
       path: '/'
@@ -346,6 +365,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminMessagesRoute: typeof AdminMessagesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   AdminRequestsIdRoute: typeof AdminRequestsIdRoute
@@ -353,6 +373,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminMessagesRoute: AdminMessagesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminQuotesIdRoute: AdminQuotesIdRoute,
   AdminRequestsIdRoute: AdminRequestsIdRoute,

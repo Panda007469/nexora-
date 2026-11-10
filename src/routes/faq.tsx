@@ -57,7 +57,7 @@ function FaqPage() {
         {/* Accordions Grouped by Topic */}
         <div className="space-y-10 md:space-y-14">
           {topics.map((topic, groupIndex) => {
-            const items = groupedFaqs[topic];
+            const items = groupedFaqs[topic] ?? [];
             const groupNum = String(groupIndex + 1).padStart(2, "0");
 
             return (

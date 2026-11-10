@@ -31,8 +31,8 @@ import { meta } from "@/components/nexora/shared";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/requests/")({
-  validateSearch: (search: Record<string, unknown>): { status?: string } => ({
-    status: typeof search.status === "string" ? search.status : undefined,
+  validateSearch: (search: Record<string, unknown>): { status?: string | undefined } => ({
+    status: typeof search["status"] === "string" ? search["status"] : undefined,
   }),
   head: () =>
     meta(
@@ -94,7 +94,7 @@ const STATUS_BADGES: Record<string, { label: string; className: string }> = {
   },
 };
 
-function StatusBadge({ status }: { status?: string | null }) {
+function StatusBadge({ status }: { status?: string | null | undefined }) {
   const key = (status ?? "new").toLowerCase();
   const config = STATUS_BADGES[key] ?? {
     label: status ? status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ") : "Unknown",
