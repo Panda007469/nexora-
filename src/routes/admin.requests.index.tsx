@@ -45,6 +45,7 @@ export const Route = createFileRoute("/admin/requests/")({
 interface RequestItem {
   id: string;
   request_code?: string | null;
+  tracking_token?: string | null;
   name?: string | null;
   email?: string | null;
   phone?: string | null;
@@ -176,9 +177,12 @@ function AdminRequestsPage() {
 
       let query = supabase
         .from("requests")
-        .select("id, request_code, name, email, phone, service, status, created_at", {
-          count: "exact",
-        })
+        .select(
+          "id, request_code, tracking_token, name, email, phone, service, status, created_at",
+          {
+            count: "exact",
+          },
+        )
         .order("created_at", { ascending: false });
 
       // Apply status filter
@@ -388,12 +392,14 @@ function AdminRequestsPage() {
                 {requests.map((row) => {
                   const requestCode = row.request_code || row.id.slice(0, 8);
                   const name = row.name || "Customer";
-                  const wa = row.phone
-                    ? whatsappUrl(
-                        row.phone,
-                        `Hi ${name}, this is Nexora Technologies about your request ${requestCode}.`,
-                      )
-                    : null;
+                  const trackingLink =
+                    row.tracking_token && typeof window !== "undefined"
+                      ? `${window.location.origin}/track?token=${row.tracking_token}`
+                      : "";
+                  const waMessage = trackingLink
+                    ? `Hi ${name}, this is Nexora Technologies. Your request ${requestCode} is received. Track it anytime: ${trackingLink}`
+                    : `Hi ${name}, this is Nexora Technologies. Your request ${requestCode} is received.`;
+                  const wa = row.phone ? whatsappUrl(row.phone, waMessage) : null;
 
                   return (
                     <TableRow

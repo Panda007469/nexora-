@@ -18,11 +18,16 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as TrackRouteImport } from './routes/track'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
+import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
 import { Route as QuoteTokenRouteImport } from './routes/quote.$token'
+import { Route as AdminQuotesIndexRouteImport } from './routes/admin.quotes.index'
 import { Route as AdminQuotesIdRouteImport } from './routes/admin.quotes.$id'
 import { Route as AdminRequestsIndexRouteImport } from './routes/admin.requests.index'
 import { Route as AdminRequestsIdRouteImport } from './routes/admin.requests.$id'
@@ -72,6 +77,11 @@ const ServicesRoute = ServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -80,6 +90,21 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProjectsRoute = AdminProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTasksRoute = AdminTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => AdminRoute,
 } as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
@@ -96,6 +121,11 @@ const QuoteTokenRoute = QuoteTokenRouteImport.update({
   id: '/quote/$token',
   path: '/quote/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQuotesIndexRoute = AdminQuotesIndexRouteImport.update({
+  id: '/quotes/',
+  path: '/quotes/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminQuotesIdRoute = AdminQuotesIdRouteImport.update({
   id: '/quotes/$id',
@@ -123,13 +153,18 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRouteWithChildren
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/track': typeof TrackRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/projects': typeof AdminProjectsRoute
+  '/admin/tasks': typeof AdminTasksRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/projects/': typeof ProjectsIndexRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/admin/requests/$id': typeof AdminRequestsIdRoute
+  '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/admin/requests/': typeof AdminRequestsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -140,13 +175,18 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/track': typeof TrackRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/projects': typeof AdminProjectsRoute
+  '/admin/tasks': typeof AdminTasksRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/admin': typeof AdminIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/admin/requests/$id': typeof AdminRequestsIdRoute
+  '/admin/quotes': typeof AdminQuotesIndexRoute
   '/admin/requests': typeof AdminRequestsIndexRoute
 }
 export interface FileRoutesById {
@@ -160,13 +200,18 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRouteWithChildren
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/track': typeof TrackRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/projects': typeof AdminProjectsRoute
+  '/admin/tasks': typeof AdminTasksRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/projects/': typeof ProjectsIndexRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/admin/requests/$id': typeof AdminRequestsIdRoute
+  '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/admin/requests/': typeof AdminRequestsIndexRoute
 }
 export interface FileRouteTypes {
@@ -181,13 +226,18 @@ export interface FileRouteTypes {
     | '/projects'
     | '/request'
     | '/services'
+    | '/track'
     | '/admin/messages'
+    | '/admin/orders'
+    | '/admin/projects'
+    | '/admin/tasks'
     | '/projects/$slug'
     | '/quote/$token'
     | '/admin/'
     | '/projects/'
     | '/admin/quotes/$id'
     | '/admin/requests/$id'
+    | '/admin/quotes/'
     | '/admin/requests/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -198,13 +248,18 @@ export interface FileRouteTypes {
     | '/login'
     | '/request'
     | '/services'
+    | '/track'
     | '/admin/messages'
+    | '/admin/orders'
+    | '/admin/projects'
+    | '/admin/tasks'
     | '/projects/$slug'
     | '/quote/$token'
     | '/admin'
     | '/projects'
     | '/admin/quotes/$id'
     | '/admin/requests/$id'
+    | '/admin/quotes'
     | '/admin/requests'
   id:
     | '__root__'
@@ -217,13 +272,18 @@ export interface FileRouteTypes {
     | '/projects'
     | '/request'
     | '/services'
+    | '/track'
     | '/admin/messages'
+    | '/admin/orders'
+    | '/admin/projects'
+    | '/admin/tasks'
     | '/projects/$slug'
     | '/quote/$token'
     | '/admin/'
     | '/projects/'
     | '/admin/quotes/$id'
     | '/admin/requests/$id'
+    | '/admin/quotes/'
     | '/admin/requests/'
   fileRoutesById: FileRoutesById
 }
@@ -237,6 +297,7 @@ export interface RootRouteChildren {
   ProjectsRoute: typeof ProjectsRouteWithChildren
   RequestRoute: typeof RequestRoute
   ServicesRoute: typeof ServicesRoute
+  TrackRoute: typeof TrackRoute
   QuoteTokenRoute: typeof QuoteTokenRoute
 }
 
@@ -305,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -317,6 +385,27 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/admin/messages'
       preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/projects': {
+      id: '/admin/projects'
+      path: '/projects'
+      fullPath: '/admin/projects'
+      preLoaderRoute: typeof AdminProjectsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tasks': {
+      id: '/admin/tasks'
+      path: '/tasks'
+      fullPath: '/admin/tasks'
+      preLoaderRoute: typeof AdminTasksRouteImport
       parentRoute: typeof AdminRoute
     }
     '/projects/': {
@@ -339,6 +428,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/quote/$token'
       preLoaderRoute: typeof QuoteTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/quotes/': {
+      id: '/admin/quotes/'
+      path: '/quotes'
+      fullPath: '/admin/quotes/'
+      preLoaderRoute: typeof AdminQuotesIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/quotes/$id': {
       id: '/admin/quotes/$id'
@@ -366,17 +462,25 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminProjectsRoute: typeof AdminProjectsRoute
+  AdminTasksRoute: typeof AdminTasksRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   AdminRequestsIdRoute: typeof AdminRequestsIdRoute
+  AdminQuotesIndexRoute: typeof AdminQuotesIndexRoute
   AdminRequestsIndexRoute: typeof AdminRequestsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminMessagesRoute: AdminMessagesRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminProjectsRoute: AdminProjectsRoute,
+  AdminTasksRoute: AdminTasksRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminQuotesIdRoute: AdminQuotesIdRoute,
   AdminRequestsIdRoute: AdminRequestsIdRoute,
+  AdminQuotesIndexRoute: AdminQuotesIndexRoute,
   AdminRequestsIndexRoute: AdminRequestsIndexRoute,
 }
 
@@ -406,6 +510,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjectsRoute: ProjectsRouteWithChildren,
   RequestRoute: RequestRoute,
   ServicesRoute: ServicesRoute,
+  TrackRoute: TrackRoute,
   QuoteTokenRoute: QuoteTokenRoute,
 }
 export const routeTree = rootRouteImport

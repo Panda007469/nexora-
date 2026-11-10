@@ -3,6 +3,10 @@ import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tansta
 import {
   LayoutDashboard,
   FileText,
+  Receipt,
+  Package,
+  CheckSquare,
+  FolderKanban,
   MessageSquare,
   ExternalLink,
   LogOut,
@@ -35,7 +39,14 @@ export const Route = createFileRoute("/admin")({
 
 interface NavItem {
   label: string;
-  to: "/admin" | "/admin/requests" | "/admin/messages";
+  to:
+    | "/admin"
+    | "/admin/requests"
+    | "/admin/quotes"
+    | "/admin/orders"
+    | "/admin/tasks"
+    | "/admin/projects"
+    | "/admin/messages";
   icon: typeof LayoutDashboard;
   active: boolean;
 }
@@ -202,6 +213,30 @@ function AdminLayout() {
       to: "/admin/requests",
       icon: FileText,
       active: location.pathname.startsWith("/admin/requests"),
+    },
+    {
+      label: "Quotes",
+      to: "/admin/quotes",
+      icon: Receipt,
+      active: location.pathname.startsWith("/admin/quotes"),
+    },
+    {
+      label: "Orders",
+      to: "/admin/orders",
+      icon: Package,
+      active: location.pathname.startsWith("/admin/orders"),
+    },
+    {
+      label: "Tasks",
+      to: "/admin/tasks",
+      icon: CheckSquare,
+      active: location.pathname.startsWith("/admin/tasks"),
+    },
+    {
+      label: "Projects",
+      to: "/admin/projects",
+      icon: FolderKanban,
+      active: location.pathname.startsWith("/admin/projects"),
     },
     {
       label: "Messages",

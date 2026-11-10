@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import {
   CheckCircle2,
@@ -23,16 +23,17 @@ import {
   Phone,
   Briefcase,
   ChevronDown,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { services, steps } from "@/data/site";
+import { services, steps, whatsappNumber } from "@/data/site";
 import { requestSchema, requestFields, CUSTOMER_TYPES, getTodayIsoDate } from "@/data/request";
 import { meta } from "@/components/nexora/shared";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FadeUp } from "@/components/layout/FadeUp";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
-import { normalizeWhatsApp } from "@/lib/whatsapp";
+import { normalizeWhatsApp, whatsappUrl } from "@/lib/whatsapp";
 import { toast } from "sonner";
 
 const iconMap = {
@@ -240,8 +241,17 @@ function Request() {
       return;
     }
 
-    setTrackingCode(data?.[0]?.code ?? "");
-    setTrackingToken(data?.[0]?.token ?? "");
+    const resolvedCode = data?.[0]?.code ?? "";
+    const resolvedToken = data?.[0]?.token ?? "";
+    setTrackingCode(resolvedCode);
+    setTrackingToken(resolvedToken);
+    if (resolvedCode) {
+      try {
+        localStorage.setItem("nexora_last_code", JSON.stringify({ code: resolvedCode }));
+      } catch {
+        // Ignore storage errors (private browsing / quota)
+      }
+    }
     setStatus("success");
   }
 
@@ -364,6 +374,10 @@ function Request() {
                           <span className="font-heading font-extrabold text-2xl text-foreground tracking-widest">
                             {trackingCode}
                           </span>
+                          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                            Save your request code. You can also track it later with the code and
+                            your email.
+                          </p>
                         </div>
 
                         {trackingToken && (
@@ -398,6 +412,40 @@ function Request() {
                             </Button>
                           </div>
                         )}
+
+                        <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+                          {trackingToken && (
+                            <Button
+                              asChild
+                              className="flex-1 rounded-xl bg-brand-gradient text-white font-semibold hover:opacity-90 text-xs sm:text-sm h-10"
+                            >
+                              <Link to="/track" search={{ token: trackingToken }}>
+                                <span>Track this request</span>
+                                <ArrowUpRight className="size-4 ml-1.5" />
+                              </Link>
+                            </Button>
+                          )}
+
+                          {whatsappUrl(
+                            whatsappNumber,
+                            `Hi Nexora, my request code is ${trackingCode}.`,
+                          ) && (
+                            <a
+                              href={
+                                whatsappUrl(
+                                  whatsappNumber,
+                                  `Hi Nexora, my request code is ${trackingCode}.`,
+                                ) ?? undefined
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-4 h-10 text-xs sm:text-sm font-semibold text-white shadow-xs hover:opacity-90 transition-opacity"
+                            >
+                              <MessageCircle className="size-4 shrink-0" />
+                              <span>Send my code to Nexora</span>
+                            </a>
+                          )}
+                        </div>
                       </div>
                     )}
 

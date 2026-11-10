@@ -25,6 +25,8 @@ import {
   Receipt,
   Plus,
   ArrowUpRight,
+  Copy,
+  Check,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { whatsappUrl, formatPhone } from "@/lib/whatsapp";
@@ -66,6 +68,7 @@ interface RequestRecord {
   id: string;
   request_code?: string | null;
   code?: string | null;
+  tracking_token?: string | null;
   name?: string | null;
   student_name?: string | null;
   email?: string | null;
@@ -314,6 +317,7 @@ function AdminRequestDetailPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
+  const [copiedTrackingLink, setCopiedTrackingLink] = useState(false);
 
   const fetchQuotes = useCallback(async () => {
     setQuotesLoading(true);
@@ -589,12 +593,27 @@ function AdminRequestDetailPage() {
   };
 
   const isAssignedToMe = Boolean(user?.id && request.assigned_to === user.id);
-  const wa = request.phone
-    ? whatsappUrl(
-        request.phone,
-        `Hi ${contactName !== "—" ? contactName : ""}, this is Nexora Technologies about your request ${requestCode}.`.trim(),
-      )
-    : null;
+  const trackingLink =
+    request.tracking_token && typeof window !== "undefined"
+      ? `${window.location.origin}/track?token=${request.tracking_token}`
+      : "";
+  const waDisplayName = contactName !== "—" ? contactName : "there";
+  const waMessage = trackingLink
+    ? `Hi ${waDisplayName}, this is Nexora Technologies. Your request ${requestCode} is received. Track it anytime: ${trackingLink}`
+    : `Hi ${waDisplayName}, this is Nexora Technologies. Your request ${requestCode} is received.`;
+  const wa = request.phone ? whatsappUrl(request.phone, waMessage) : null;
+
+  async function handleCopyTrackingLink() {
+    if (!trackingLink) return;
+    try {
+      await navigator.clipboard.writeText(trackingLink);
+      setCopiedTrackingLink(true);
+      toast.success("Tracking link copied");
+      setTimeout(() => setCopiedTrackingLink(false), 2000);
+    } catch {
+      toast.error("Failed to copy tracking link");
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -728,17 +747,40 @@ function AdminRequestDetailPage() {
                       <Phone className="size-3.5 text-muted-foreground shrink-0" />
                       <span>{contactPhone}</span>
                     </div>
-                    {wa && (
-                      <a
-                        href={wa}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1 text-xs font-semibold text-white shadow-2xs hover:opacity-90 transition-opacity"
-                      >
-                        <MessageCircle className="size-3.5" />
-                        <span>Chat on WhatsApp</span>
-                      </a>
-                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {wa && (
+                        <a
+                          href={wa}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1 text-xs font-semibold text-white shadow-2xs hover:opacity-90 transition-opacity"
+                        >
+                          <MessageCircle className="size-3.5" />
+                          <span>Chat on WhatsApp</span>
+                        </a>
+                      )}
+                      {trackingLink && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void handleCopyTrackingLink()}
+                          className="h-7 px-2.5 text-xs border-border gap-1.5"
+                        >
+                          {copiedTrackingLink ? (
+                            <>
+                              <Check className="size-3.5 text-emerald-500" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="size-3.5" />
+                              <span>Copy tracking link</span>
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 

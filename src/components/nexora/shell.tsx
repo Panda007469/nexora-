@@ -13,6 +13,7 @@ import {
   Twitter,
   LogIn,
   LayoutDashboard,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Brand } from "./shared";
@@ -124,14 +125,14 @@ export function SiteHeader() {
           </Link>
 
           {/* Middle: Desktop navigation links */}
-          <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
+          <nav className="hidden md:flex items-center gap-5 lg:gap-8" aria-label="Main navigation">
             {navigation.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 activeOptions={{ exact: item.to === "/" }}
                 activeProps={{ className: "text-foreground font-semibold after:scale-x-100" }}
-                className="relative py-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:scale-x-0 after:bg-brand-gradient after:transition-transform after:duration-200"
+                className="relative py-1 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:scale-x-0 after:bg-brand-gradient after:transition-transform after:duration-200"
               >
                 {item.name}
               </Link>
@@ -180,13 +181,16 @@ export function SiteHeader() {
                 to={item.to}
                 onClick={() => setOpen(false)}
                 aria-current={pathname === item.to ? "page" : undefined}
-                className={`py-2 text-base font-medium transition-colors ${
+                className={`flex items-center gap-2 py-2 text-base font-medium transition-colors ${
                   pathname === item.to
                     ? "text-brand-gradient font-semibold"
                     : "text-foreground hover:text-royal"
                 }`}
               >
-                {item.name}
+                {item.to === "/track" && (
+                  <Search size={16} className="text-royal dark:text-glow shrink-0" />
+                )}
+                <span>{item.name}</span>
               </Link>
             ))}
 

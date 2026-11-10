@@ -38,6 +38,7 @@ export const navigation = [
   { name: "Projects", to: "/projects" },
   { name: "About", to: "/about" },
   { name: "Contact", to: "/contact" },
+  { name: "Track Project", to: "/track" },
 ] as const;
 
 export interface ServiceItem {
