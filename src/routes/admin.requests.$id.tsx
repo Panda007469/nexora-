@@ -484,6 +484,7 @@ function AdminRequestDetailPage() {
         .from("quotes")
         .insert({
           request_id: id,
+          created_by: user.id,
         })
         .select("id")
         .single();
@@ -577,10 +578,7 @@ function AdminRequestDetailPage() {
   async function handleDeleteRequirement(reqId: string) {
     setDeletingReqId(reqId);
     try {
-      const { error: delErr } = await supabase
-        .from("requirements")
-        .delete()
-        .eq("id", reqId);
+      const { error: delErr } = await supabase.from("requirements").delete().eq("id", reqId);
 
       if (delErr) {
         throw new Error(delErr.message);
@@ -883,550 +881,569 @@ function AdminRequestDetailPage() {
 
           <TabsContent value="details" className="space-y-6 mt-0">
             {/* Contact Card */}
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-royal/10 text-royal dark:text-glow">
-                  <User className="size-4" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-semibold">Contact Information</CardTitle>
-                  <CardDescription className="text-xs">
-                    Client profile and reachability details
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                {/* Name */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Full Name
-                  </span>
-                  <span className="mt-1 font-medium text-foreground block">{contactName}</span>
-                </div>
-
-                {/* Customer Type */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Customer Type
-                  </span>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <Tag className="size-3.5 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{contactType}</span>
+            <Card className="border-border bg-card shadow-xs">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-royal/10 text-royal dark:text-glow">
+                    <User className="size-4" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold">Contact Information</CardTitle>
+                    <CardDescription className="text-xs">
+                      Client profile and reachability details
+                    </CardDescription>
                   </div>
                 </div>
-
-                {/* Email */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Email Address
-                  </span>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                    {contactEmail !== "—" ? (
-                      <a
-                        href={`mailto:${contactEmail}`}
-                        className="font-medium text-foreground hover:text-royal hover:underline truncate"
-                      >
-                        {contactEmail}
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  {/* Name */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Full Name
+                    </span>
+                    <span className="mt-1 font-medium text-foreground block">{contactName}</span>
                   </div>
-                </div>
 
-                {/* Phone & WhatsApp */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Phone / WhatsApp
-                  </span>
-                  <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
-                    <div className="flex items-center gap-1.5 font-medium text-foreground">
-                      <Phone className="size-3.5 text-muted-foreground shrink-0" />
-                      <span>{contactPhone}</span>
+                  {/* Customer Type */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Customer Type
+                    </span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <Tag className="size-3.5 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{contactType}</span>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {wa && (
+                  </div>
+
+                  {/* Email */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Email Address
+                    </span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                      {contactEmail !== "—" ? (
                         <a
-                          href={wa}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1 text-xs font-semibold text-white shadow-2xs hover:opacity-90 transition-opacity"
+                          href={`mailto:${contactEmail}`}
+                          className="font-medium text-foreground hover:text-royal hover:underline truncate"
                         >
-                          <MessageCircle className="size-3.5" />
-                          <span>Chat on WhatsApp</span>
+                          {contactEmail}
                         </a>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
                       )}
-                      {trackingLink && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => void handleCopyTrackingLink()}
-                          className="h-7 px-2.5 text-xs border-border gap-1.5"
-                        >
-                          {copiedTrackingLink ? (
-                            <>
-                              <Check className="size-3.5 text-emerald-500" />
-                              <span>Copied!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="size-3.5" />
-                              <span>Copy tracking link</span>
-                            </>
-                          )}
-                        </Button>
-                      )}
+                    </div>
+                  </div>
+
+                  {/* Phone & WhatsApp */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Phone / WhatsApp
+                    </span>
+                    <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 font-medium text-foreground">
+                        <Phone className="size-3.5 text-muted-foreground shrink-0" />
+                        <span>{contactPhone}</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {wa && (
+                          <a
+                            href={wa}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1 text-xs font-semibold text-white shadow-2xs hover:opacity-90 transition-opacity"
+                          >
+                            <MessageCircle className="size-3.5" />
+                            <span>Chat on WhatsApp</span>
+                          </a>
+                        )}
+                        {trackingLink && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => void handleCopyTrackingLink()}
+                            className="h-7 px-2.5 text-xs border-border gap-1.5"
+                          >
+                            {copiedTrackingLink ? (
+                              <>
+                                <Check className="size-3.5 text-emerald-500" />
+                                <span>Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="size-3.5" />
+                                <span>Copy tracking link</span>
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Organization / College */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      College / Organization
+                    </span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <Building2 className="size-3.5 text-muted-foreground shrink-0" />
+                      <span className="font-medium text-foreground">{contactOrg}</span>
+                    </div>
+                  </div>
+
+                  {/* City */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      City / Location
+                    </span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <MapPin className="size-3.5 text-muted-foreground shrink-0" />
+                      <span className="font-medium text-foreground">{contactCity}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Project Card */}
+            <Card className="border-border bg-card shadow-xs">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-violet/10 text-violet dark:text-violet-300">
+                    <Cpu className="size-4" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold">Project Scope</CardTitle>
+                    <CardDescription className="text-xs">
+                      Service required, problem statement, and timelines
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                  {/* Service */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Service Area
+                    </span>
+                    <span className="mt-1 font-medium text-foreground capitalize block">
+                      {projectName.replace(/-/g, " ")}
+                    </span>
+                  </div>
+
+                  {/* Deadline */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Target Deadline
+                    </span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <Calendar className="size-3.5 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{projectDeadline}</span>
+                    </div>
+                  </div>
+
+                  {/* Budget */}
+                  <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Estimated Budget
+                    </span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <CircleDollarSign className="size-3.5 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{projectBudget}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Organization / College */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    College / Organization
+                {/* Project Idea / Description */}
+                <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
+                    Project Idea &amp; Requirements
                   </span>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <Building2 className="size-3.5 text-muted-foreground shrink-0" />
-                    <span className="font-medium text-foreground">{contactOrg}</span>
+                  <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                    {projectIdea}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quotes Card */}
+            <Card className="border-border bg-card shadow-xs">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-royal/10 text-royal dark:text-glow">
+                    <Receipt className="size-4" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold">Quotes</CardTitle>
+                    <CardDescription className="text-xs">
+                      Milestone breakdowns, pricing estimates, and customer approval status
+                    </CardDescription>
                   </div>
                 </div>
 
-                {/* City */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    City / Location
-                  </span>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <MapPin className="size-3.5 text-muted-foreground shrink-0" />
-                    <span className="font-medium text-foreground">{contactCity}</span>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => void handleCreateQuote()}
+                  disabled={creatingQuote}
+                  className="gap-1.5 text-xs h-8 bg-brand-gradient text-white hover:opacity-90 self-start sm:self-auto"
+                >
+                  {creatingQuote ? (
+                    <LoaderCircle className="size-3.5 animate-spin" />
+                  ) : (
+                    <Plus className="size-3.5" />
+                  )}
+                  <span>{creatingQuote ? "Creating..." : "Create quote"}</span>
+                </Button>
+              </CardHeader>
+
+              <CardContent>
+                {/* Quotes Loading State */}
+                {quotesLoading && (
+                  <div className="space-y-2 py-2">
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Project Card */}
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-violet/10 text-violet dark:text-violet-300">
-                  <Cpu className="size-4" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-semibold">Project Scope</CardTitle>
-                  <CardDescription className="text-xs">
-                    Service required, problem statement, and timelines
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                {/* Service */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Service Area
-                  </span>
-                  <span className="mt-1 font-medium text-foreground capitalize block">
-                    {projectName.replace(/-/g, " ")}
-                  </span>
-                </div>
-
-                {/* Deadline */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Target Deadline
-                  </span>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <Calendar className="size-3.5 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{projectDeadline}</span>
-                  </div>
-                </div>
-
-                {/* Budget */}
-                <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Estimated Budget
-                  </span>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <CircleDollarSign className="size-3.5 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{projectBudget}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Project Idea / Description */}
-              <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                  Project Idea &amp; Requirements
-                </span>
-                <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                  {projectIdea}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quotes Card */}
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-royal/10 text-royal dark:text-glow">
-                  <Receipt className="size-4" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-semibold">Quotes</CardTitle>
-                  <CardDescription className="text-xs">
-                    Milestone breakdowns, pricing estimates, and customer approval status
-                  </CardDescription>
-                </div>
-              </div>
-
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => void handleCreateQuote()}
-                disabled={creatingQuote}
-                className="gap-1.5 text-xs h-8 bg-brand-gradient text-white hover:opacity-90 self-start sm:self-auto"
-              >
-                {creatingQuote ? (
-                  <LoaderCircle className="size-3.5 animate-spin" />
-                ) : (
-                  <Plus className="size-3.5" />
                 )}
-                <span>{creatingQuote ? "Creating..." : "Create quote"}</span>
-              </Button>
-            </CardHeader>
 
-            <CardContent>
-              {/* Quotes Loading State */}
-              {quotesLoading && (
-                <div className="space-y-2 py-2">
-                  <Skeleton className="h-10 w-full rounded-lg" />
-                  <Skeleton className="h-10 w-full rounded-lg" />
-                </div>
-              )}
+                {/* Quotes Error State */}
+                {!quotesLoading && quotesError && (
+                  <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center space-y-2">
+                    <p className="text-xs text-destructive">{quotesError}</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void fetchQuotes()}
+                      className="h-7 text-xs border-border gap-1.5"
+                    >
+                      <RefreshCw className="size-3" />
+                      Retry
+                    </Button>
+                  </div>
+                )}
 
-              {/* Quotes Error State */}
-              {!quotesLoading && quotesError && (
-                <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center space-y-2">
-                  <p className="text-xs text-destructive">{quotesError}</p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void fetchQuotes()}
-                    className="h-7 text-xs border-border gap-1.5"
-                  >
-                    <RefreshCw className="size-3" />
-                    Retry
-                  </Button>
-                </div>
-              )}
+                {/* Quotes Empty State */}
+                {!quotesLoading && !quotesError && quotes.length === 0 && (
+                  <div className="rounded-xl border border-dashed border-border p-6 text-center">
+                    <Receipt className="size-8 text-muted-foreground/60 mx-auto mb-2" />
+                    <p className="text-xs font-medium text-foreground">No quotes created yet</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
+                      Generate an official milestone quote for this customer request.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void handleCreateQuote()}
+                      disabled={creatingQuote}
+                      className="h-8 text-xs gap-1.5 border-border"
+                    >
+                      <Plus className="size-3.5" />
+                      Create first quote
+                    </Button>
+                  </div>
+                )}
 
-              {/* Quotes Empty State */}
-              {!quotesLoading && !quotesError && quotes.length === 0 && (
-                <div className="rounded-xl border border-dashed border-border p-6 text-center">
-                  <Receipt className="size-8 text-muted-foreground/60 mx-auto mb-2" />
-                  <p className="text-xs font-medium text-foreground">No quotes created yet</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
-                    Generate an official milestone quote for this customer request.
-                  </p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void handleCreateQuote()}
-                    disabled={creatingQuote}
-                    className="h-8 text-xs gap-1.5 border-border"
-                  >
-                    <Plus className="size-3.5" />
-                    Create first quote
-                  </Button>
-                </div>
-              )}
-
-              {/* Quotes Table */}
-              {!quotesLoading && !quotesError && quotes.length > 0 && (
-                <div className="rounded-xl border border-border overflow-hidden">
-                  <Table>
-                    <TableHeader className="bg-muted/40">
-                      <TableRow className="border-b border-border text-[11px]">
-                        <TableHead className="font-semibold text-xs py-2.5">Quote Number</TableHead>
-                        <TableHead className="font-semibold text-xs py-2.5">Status</TableHead>
-                        <TableHead className="font-semibold text-xs py-2.5 text-right">
-                          Total
-                        </TableHead>
-                        <TableHead className="font-semibold text-xs py-2.5 text-right pr-4">
-                          Action
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {quotes.map((q) => (
-                        <TableRow key={q.id} className="border-b border-border hover:bg-muted/20">
-                          <TableCell className="font-mono font-semibold text-xs py-3 text-foreground">
-                            {q.quote_number}
-                          </TableCell>
-                          <TableCell className="py-3">
-                            <QuoteStatusBadge status={q.status} />
-                          </TableCell>
-                          <TableCell className="font-mono text-xs font-bold text-foreground text-right py-3">
-                            {formatMoney(q.total, q.currency || "INR")}
-                          </TableCell>
-                          <TableCell className="text-right py-3 pr-4">
-                            <Button
-                              asChild
-                              size="sm"
-                              variant="outline"
-                              className="h-7 text-xs border-border px-2.5 gap-1"
-                            >
-                              <Link to="/admin/quotes/$id" params={{ id: q.id }}>
-                                <span>Open</span>
-                                <ArrowUpRight className="size-3" />
-                              </Link>
-                            </Button>
-                          </TableCell>
+                {/* Quotes Table */}
+                {!quotesLoading && !quotesError && quotes.length > 0 && (
+                  <div className="rounded-xl border border-border overflow-hidden">
+                    <Table>
+                      <TableHeader className="bg-muted/40">
+                        <TableRow className="border-b border-border text-[11px]">
+                          <TableHead className="font-semibold text-xs py-2.5">
+                            Quote Number
+                          </TableHead>
+                          <TableHead className="font-semibold text-xs py-2.5">Status</TableHead>
+                          <TableHead className="font-semibold text-xs py-2.5 text-right">
+                            Total
+                          </TableHead>
+                          <TableHead className="font-semibold text-xs py-2.5 text-right pr-4">
+                            Action
+                          </TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Technical Details Card */}
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <Layers className="size-4" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-semibold">Technical Details</CardTitle>
-                  <CardDescription className="text-xs">
-                    Structured specifications and hardware parameters
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>{renderJsonbRows(techDetailsData)}</CardContent>
-          </Card>
-
-          {/* Deliverables Card */}
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  <CheckCircle2 className="size-4" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-semibold">Deliverables</CardTitle>
-                  <CardDescription className="text-xs">
-                    Milestone outputs, prototypes, code, and documentation
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>{renderJsonbRows(deliverablesData)}</CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Requirements Tab Content */}
-        <TabsContent value="requirements" className="space-y-6 mt-0">
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-brand-gradient text-white">
-                  <ListChecks className="size-4" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-semibold">
-                    Requirements Specification
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Customer requirements with MoSCoW prioritization
-                  </CardDescription>
-                </div>
-              </div>
-
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleOpenAddReq}
-                className="gap-1.5 text-xs h-8 bg-brand-gradient text-white hover:opacity-90 self-start sm:self-auto"
-              >
-                <Plus className="size-3.5" />
-                <span>Add requirement</span>
-              </Button>
-            </CardHeader>
-
-            <CardContent>
-              {/* Requirements Loading State */}
-              {reqsLoading && (
-                <div className="space-y-2 py-2">
-                  <Skeleton className="h-10 w-full rounded-lg" />
-                  <Skeleton className="h-10 w-full rounded-lg" />
-                </div>
-              )}
-
-              {/* Requirements Error State */}
-              {!reqsLoading && reqsError && (
-                <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center space-y-2">
-                  <p className="text-xs text-destructive">{reqsError}</p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void fetchRequirements()}
-                    className="h-7 text-xs border-border gap-1.5"
-                  >
-                    <RefreshCw className="size-3" />
-                    Retry
-                  </Button>
-                </div>
-              )}
-
-              {/* Requirements Empty State */}
-              {!reqsLoading && !reqsError && requirements.length === 0 && (
-                <div className="rounded-xl border border-dashed border-border p-8 text-center">
-                  <ListChecks className="size-8 text-muted-foreground/60 mx-auto mb-2" />
-                  <p className="text-xs font-medium text-foreground">No requirements recorded yet</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
-                    Break down this customer request into structured Must/Should/Could deliverables.
-                  </p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleOpenAddReq}
-                    className="h-8 text-xs gap-1.5 border-border"
-                  >
-                    <Plus className="size-3.5" />
-                    Add first requirement
-                  </Button>
-                </div>
-              )}
-
-              {/* Requirements Table */}
-              {!reqsLoading && !reqsError && requirements.length > 0 && (
-                <div className="rounded-xl border border-border overflow-hidden">
-                  <Table>
-                    <TableHeader className="bg-muted/40">
-                      <TableRow className="border-b border-border text-[11px]">
-                        <TableHead className="w-28 font-semibold text-xs py-2.5">Priority</TableHead>
-                        <TableHead className="font-semibold text-xs py-2.5">Title &amp; Category</TableHead>
-                        <TableHead className="hidden md:table-cell font-semibold text-xs py-2.5">Description</TableHead>
-                        <TableHead className="font-semibold text-xs py-2.5 text-right pr-4 w-24">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {requirements.map((r) => {
-                        const priorityCfg =
-                          REQUIREMENT_PRIORITY_CONFIG[r.priority] ??
-                          REQUIREMENT_PRIORITY_CONFIG.must;
-                        return (
-                          <TableRow key={r.id} className="border-b border-border hover:bg-muted/20">
-                            <TableCell className="py-3 align-top">
-                              <Badge
+                      </TableHeader>
+                      <TableBody>
+                        {quotes.map((q) => (
+                          <TableRow key={q.id} className="border-b border-border hover:bg-muted/20">
+                            <TableCell className="font-mono font-semibold text-xs py-3 text-foreground">
+                              {q.quote_number}
+                            </TableCell>
+                            <TableCell className="py-3">
+                              <QuoteStatusBadge status={q.status} />
+                            </TableCell>
+                            <TableCell className="font-mono text-xs font-bold text-foreground text-right py-3">
+                              {formatMoney(q.total, q.currency || "INR")}
+                            </TableCell>
+                            <TableCell className="text-right py-3 pr-4">
+                              <Button
+                                asChild
+                                size="sm"
                                 variant="outline"
-                                className={cn(
-                                  "text-[11px] font-semibold px-2 py-0.5",
-                                  priorityCfg.className,
-                                )}
+                                className="h-7 text-xs border-border px-2.5 gap-1"
                               >
-                                {priorityCfg.badgeLabel}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="py-3 align-top">
-                              <div className="space-y-1">
-                                <div className="font-medium text-xs sm:text-sm text-foreground">
-                                  {r.title}
-                                </div>
-                                {r.category && (
-                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                                    {r.category}
-                                  </Badge>
-                                )}
-                                {r.description && (
-                                  <p className="text-xs text-muted-foreground md:hidden mt-1 whitespace-pre-wrap">
-                                    {r.description}
-                                  </p>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell py-3 align-top text-xs text-muted-foreground whitespace-pre-wrap max-w-xs">
-                              {r.description || (
-                                <span className="italic text-muted-foreground/60">—</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-right py-3 pr-4 align-top">
-                              <div className="flex items-center justify-end gap-1">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleOpenEditReq(r)}
-                                  className="size-7 text-muted-foreground hover:text-foreground"
-                                >
-                                  <Pencil className="size-3.5" />
-                                  <span className="sr-only">Edit requirement</span>
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      disabled={deletingReqId === r.id}
-                                      className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                    >
-                                      {deletingReqId === r.id ? (
-                                        <LoaderCircle className="size-3.5 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="size-3.5" />
-                                      )}
-                                      <span className="sr-only">Delete requirement</span>
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Requirement?</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete &ldquo;{r.title}&rdquo;?
-                                        This cannot be undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => void handleDeleteRequirement(r.id)}
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                      >
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
+                                <Link to="/admin/quotes/$id" params={{ id: q.id }}>
+                                  <span>Open</span>
+                                  <ArrowUpRight className="size-3" />
+                                </Link>
+                              </Button>
                             </TableCell>
                           </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Technical Details Card */}
+            <Card className="border-border bg-card shadow-xs">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <Layers className="size-4" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold">Technical Details</CardTitle>
+                    <CardDescription className="text-xs">
+                      Structured specifications and hardware parameters
+                    </CardDescription>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardHeader>
+              <CardContent>{renderJsonbRows(techDetailsData)}</CardContent>
+            </Card>
+
+            {/* Deliverables Card */}
+            <Card className="border-border bg-card shadow-xs">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <CheckCircle2 className="size-4" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold">Deliverables</CardTitle>
+                    <CardDescription className="text-xs">
+                      Milestone outputs, prototypes, code, and documentation
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>{renderJsonbRows(deliverablesData)}</CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Requirements Tab Content */}
+          <TabsContent value="requirements" className="space-y-6 mt-0">
+            <Card className="border-border bg-card shadow-xs">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-brand-gradient text-white">
+                    <ListChecks className="size-4" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold">
+                      Requirements Specification
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Customer requirements with MoSCoW prioritization
+                    </CardDescription>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleOpenAddReq}
+                  className="gap-1.5 text-xs h-8 bg-brand-gradient text-white hover:opacity-90 self-start sm:self-auto"
+                >
+                  <Plus className="size-3.5" />
+                  <span>Add requirement</span>
+                </Button>
+              </CardHeader>
+
+              <CardContent>
+                {/* Requirements Loading State */}
+                {reqsLoading && (
+                  <div className="space-y-2 py-2">
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                  </div>
+                )}
+
+                {/* Requirements Error State */}
+                {!reqsLoading && reqsError && (
+                  <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center space-y-2">
+                    <p className="text-xs text-destructive">{reqsError}</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void fetchRequirements()}
+                      className="h-7 text-xs border-border gap-1.5"
+                    >
+                      <RefreshCw className="size-3" />
+                      Retry
+                    </Button>
+                  </div>
+                )}
+
+                {/* Requirements Empty State */}
+                {!reqsLoading && !reqsError && requirements.length === 0 && (
+                  <div className="rounded-xl border border-dashed border-border p-8 text-center">
+                    <ListChecks className="size-8 text-muted-foreground/60 mx-auto mb-2" />
+                    <p className="text-xs font-medium text-foreground">
+                      No requirements recorded yet
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
+                      Break down this customer request into structured Must/Should/Could
+                      deliverables.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleOpenAddReq}
+                      className="h-8 text-xs gap-1.5 border-border"
+                    >
+                      <Plus className="size-3.5" />
+                      Add first requirement
+                    </Button>
+                  </div>
+                )}
+
+                {/* Requirements Table */}
+                {!reqsLoading && !reqsError && requirements.length > 0 && (
+                  <div className="rounded-xl border border-border overflow-hidden">
+                    <Table>
+                      <TableHeader className="bg-muted/40">
+                        <TableRow className="border-b border-border text-[11px]">
+                          <TableHead className="w-28 font-semibold text-xs py-2.5">
+                            Priority
+                          </TableHead>
+                          <TableHead className="font-semibold text-xs py-2.5">
+                            Title &amp; Category
+                          </TableHead>
+                          <TableHead className="hidden md:table-cell font-semibold text-xs py-2.5">
+                            Description
+                          </TableHead>
+                          <TableHead className="font-semibold text-xs py-2.5 text-right pr-4 w-24">
+                            Actions
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {requirements.map((r) => {
+                          const priorityCfg =
+                            REQUIREMENT_PRIORITY_CONFIG[r.priority] ??
+                            REQUIREMENT_PRIORITY_CONFIG.must;
+                          return (
+                            <TableRow
+                              key={r.id}
+                              className="border-b border-border hover:bg-muted/20"
+                            >
+                              <TableCell className="py-3 align-top">
+                                <Badge
+                                  variant="outline"
+                                  className={cn(
+                                    "text-[11px] font-semibold px-2 py-0.5",
+                                    priorityCfg.className,
+                                  )}
+                                >
+                                  {priorityCfg.badgeLabel}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="py-3 align-top">
+                                <div className="space-y-1">
+                                  <div className="font-medium text-xs sm:text-sm text-foreground">
+                                    {r.title}
+                                  </div>
+                                  {r.category && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-[10px] px-1.5 py-0 h-4"
+                                    >
+                                      {r.category}
+                                    </Badge>
+                                  )}
+                                  {r.description && (
+                                    <p className="text-xs text-muted-foreground md:hidden mt-1 whitespace-pre-wrap">
+                                      {r.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell className="hidden md:table-cell py-3 align-top text-xs text-muted-foreground whitespace-pre-wrap max-w-xs">
+                                {r.description || (
+                                  <span className="italic text-muted-foreground/60">—</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right py-3 pr-4 align-top">
+                                <div className="flex items-center justify-end gap-1">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleOpenEditReq(r)}
+                                    className="size-7 text-muted-foreground hover:text-foreground"
+                                  >
+                                    <Pencil className="size-3.5" />
+                                    <span className="sr-only">Edit requirement</span>
+                                  </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        disabled={deletingReqId === r.id}
+                                        className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                      >
+                                        {deletingReqId === r.id ? (
+                                          <LoaderCircle className="size-3.5 animate-spin" />
+                                        ) : (
+                                          <Trash2 className="size-3.5" />
+                                        )}
+                                        <span className="sr-only">Delete requirement</span>
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete Requirement?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to delete &ldquo;{r.title}&rdquo;?
+                                          This cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => void handleDeleteRequirement(r.id)}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          Delete
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Right Column: Actions Card */}
         <div className="space-y-6">
@@ -1567,9 +1584,7 @@ function AdminRequestDetailPage() {
         <DialogContent className="sm:max-w-md">
           <form onSubmit={(e) => void handleSaveRequirement(e)}>
             <DialogHeader>
-              <DialogTitle>
-                {editingReq ? "Edit Requirement" : "Add Requirement"}
-              </DialogTitle>
+              <DialogTitle>{editingReq ? "Edit Requirement" : "Add Requirement"}</DialogTitle>
               <DialogDescription>
                 Specify the engineering deliverable, priority, and acceptance notes.
               </DialogDescription>

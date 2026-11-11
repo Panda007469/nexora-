@@ -44,6 +44,8 @@ const VALUES = [
 ];
 
 function About() {
+  const publishedTeam = team.filter((member) => Boolean(member.published));
+
   return (
     <div className="bg-background text-foreground min-h-screen">
       <PageHeader title="About Us" breadcrumb={[{ label: "About" }]} />
@@ -171,8 +173,8 @@ function About() {
           </section>
         </FadeUp>
 
-        {/* Team Section (Render only if team exists in src/data) */}
-        {team && team.length > 0 && (
+        {/* Team Section (Render only if published team members exist) */}
+        {publishedTeam.length > 0 && (
           <FadeUp delay={0.2}>
             <section className="mt-16 md:mt-24">
               <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
@@ -189,7 +191,7 @@ function About() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {team.map((member) => (
+                {publishedTeam.map((member) => (
                   <article
                     key={member.name}
                     className="flex flex-col items-center text-center p-8 rounded-3xl border border-border bg-card shadow-sm hover:shadow-md transition-all hover:-translate-y-1"

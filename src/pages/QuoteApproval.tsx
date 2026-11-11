@@ -42,26 +42,26 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface QuoteItem {
-  id?: string;
   description: string;
   qty: number | string;
   unit_price: number | string;
 }
 
 interface QuotePayload {
-  id: string;
-  request_id?: string;
-  version?: number;
-  scope?: string | null;
-  total?: number;
-  currency?: string;
-  timeline_days?: number | null;
+  quote_number?: string | null;
+  status?: "sent" | "accepted" | "declined" | string | null;
+  currency?: string | null;
+  subtotal?: number | null;
+  tax_percent?: number | null;
+  total?: number | null;
   valid_until?: string | null;
-  status?: string;
-  customer_comment?: string | null;
+  expired?: boolean | null;
+  terms?: string | null;
+  scope?: string | null;
+  timeline_days?: number | null;
+  customer_name?: string | null;
+  request_code?: string | null;
   responded_at?: string | null;
-  created_at?: string | null;
-  expired?: boolean;
   items?: QuoteItem[] | null;
 }
 
@@ -118,8 +118,8 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
   const [error, setError] = useState<string | null>(null);
   const [quote, setQuote] = useState<QuotePayload | null>(null);
 
-  // Decision state
-  const [comment, setComment] = useState("");
+  // Decision note (max 1000 characters)
+  const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const fetchQuote = useCallback(async () => {
@@ -128,7 +128,7 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
     setNotFound(false);
 
     try {
-      const { data, error: rpcError } = await supabase.rpc("get_quote_by_token", {
+      const { data, error: rpcError } = await supabase.rpc("get_quote", {
         t: token,
       });
 
@@ -143,14 +143,14 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
         return;
       }
 
-      const rows = (Array.isArray(data) ? data : [data]) as QuotePayload[];
-      if (rows.length === 0 || !rows[0]) {
+      const res = (Array.isArray(data) ? data[0] : data) as QuotePayload | null;
+      if (!res || (!res.quote_number && !res.total && !res.status)) {
         setNotFound(true);
         setQuote(null);
         return;
       }
 
-      setQuote(rows[0]);
+      setQuote(res);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to load quote details.";
       setError(msg);
@@ -164,24 +164,20 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
     void fetchQuote();
   }, [fetchQuote]);
 
-  const handleDecision = async (decision: "approved" | "rejected") => {
+  const handleDecision = async (decision: "accepted" | "declined") => {
     setSubmitting(true);
     try {
-      const { error: rpcError } = await supabase.rpc("respond_to_quote", {
+      const { error: rpcError } = await supabase.rpc("respond_quote", {
         t: token,
         decision,
-        comment: comment.trim() || null,
+        note: note.trim() || null,
       });
 
       if (rpcError) {
         throw new Error(rpcError.message);
       }
 
-      toast.success(
-        decision === "approved"
-          ? "Quote approved successfully!"
-          : "Quote rejected.",
-      );
+      toast.success(decision === "accepted" ? "Quote approved successfully!" : "Quote declined.");
       await fetchQuote();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to submit decision.";
@@ -208,7 +204,7 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
     );
   }
 
-  // 2. Error State (real error text for network or RPC errors)
+  // 2. Real Error State (network or RPC errors)
   if (error && !quote) {
     return (
       <div className="bg-background min-h-screen">
@@ -216,9 +212,7 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
         <div className="container max-w-lg mx-auto py-16 px-4">
           <Card className="border-destructive/30 bg-destructive/5 text-center p-8">
             <AlertCircle className="size-10 text-destructive mx-auto mb-3" />
-            <CardTitle className="text-lg font-bold text-foreground">
-              Error Loading Quote
-            </CardTitle>
+            <CardTitle className="text-lg font-bold text-foreground">Error Loading Quote</CardTitle>
             <p className="text-xs text-muted-foreground mt-2 mb-5">{error}</p>
             <Button
               onClick={() => void fetchQuote()}
@@ -247,7 +241,8 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
               Quote not found
             </CardTitle>
             <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-2 leading-relaxed">
-              We couldn&apos;t find a quote with that link. Check the link and try again, or contact us if you need assistance.
+              We couldn&apos;t find a quote with that link. Check the link and try again, or contact
+              us if you need assistance.
             </CardDescription>
             <div className="pt-6">
               <Button asChild variant="outline" className="border-border text-xs h-9">
@@ -260,17 +255,26 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
     );
   }
 
-  // Derived values
+  // Financial values
   const currency = quote?.currency || "INR";
-  const total = Number(quote?.total ?? 0);
+  const subtotal = Number(quote?.subtotal ?? 0);
+  const taxPercent = Number(quote?.tax_percent ?? 0);
+  const taxAmount = (subtotal * taxPercent) / 100;
+  const total =
+    quote?.total !== null && quote?.total !== undefined
+      ? Number(quote.total)
+      : subtotal + taxAmount;
+
   const items = Array.isArray(quote?.items) ? quote.items : [];
   const status = (quote?.status || "sent").toLowerCase();
   const isExpired = Boolean(quote?.expired);
   const canRespond = status === "sent" && !isExpired;
 
+  const quoteNumber = quote?.quote_number || "NX-QUOTE";
+
   const waExpiredUrl = whatsappUrl(
     whatsappNumber,
-    `Hi Nexora Technologies, I would like to inquire about my expired project quote.`,
+    `Hi Nexora Technologies, I would like to inquire about my expired quote ${quoteNumber}.`,
   );
 
   return (
@@ -278,34 +282,32 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
       {/* Page Header */}
       <div className="print:hidden">
         <PageHeader
-          title="Project Quotation"
-          breadcrumb={[
-            { label: "Home", href: "/" },
-            { label: "Quote Approval" },
-          ]}
+          title={quoteNumber}
+          breadcrumb={[{ label: "Home", href: "/" }, { label: "Project Quotation" }]}
         />
       </div>
 
       <main className="container max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 space-y-6">
-        {/* Top Control Bar: Print button & Status summary */}
+        {/* Top Control Bar: Print button & Validity summary */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
               <span className="text-lg font-bold text-foreground font-heading">
-                Engineering Proposal
+                Engineering Quotation
               </span>
-              {quote?.version && quote.version > 1 && (
-                <Badge variant="secondary" className="text-xs">
-                  v{quote.version}
-                </Badge>
-              )}
+              <Badge variant="outline" className="font-mono text-xs border-border">
+                {quoteNumber}
+              </Badge>
             </div>
 
             <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1.5 flex-wrap">
               {quote?.timeline_days && (
                 <div className="flex items-center gap-1.5">
                   <Clock className="size-3.5 text-muted-foreground/70" />
-                  <span>Timeline: <strong>{quote.timeline_days} days</strong></span>
+                  <span>
+                    Estimated timeline:{" "}
+                    <strong className="text-foreground">{quote.timeline_days} days</strong>
+                  </span>
                 </div>
               )}
               {quote?.valid_until && (
@@ -335,8 +337,8 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
         </div>
 
         {/* Status Plain Messages */}
-        {/* 1. Approved plain message */}
-        {status === "approved" && (
+        {/* 1. Accepted plain message */}
+        {status === "accepted" && (
           <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5 flex items-start sm:items-center gap-3.5 text-emerald-700 dark:text-emerald-300">
             <CheckCircle2 className="size-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
             <div className="flex-1">
@@ -350,32 +352,30 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
           </div>
         )}
 
-        {/* 2. Rejected plain message */}
-        {status === "rejected" && (
+        {/* 2. Declined plain message */}
+        {status === "declined" && (
           <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-5 flex items-start sm:items-center gap-3.5 text-destructive">
             <XCircle className="size-6 shrink-0" />
             <div className="flex-1">
-              <h3 className="font-semibold text-sm">This quote has been rejected.</h3>
+              <h3 className="font-semibold text-sm">This quote has been declined.</h3>
               <p className="text-xs opacity-90 mt-0.5">
                 {quote?.responded_at
                   ? `Recorded on ${formatDateTime(quote.responded_at)}.`
-                  : "You have rejected this quotation."}
+                  : "You have declined this quotation."}
               </p>
             </div>
           </div>
         )}
 
         {/* 3. Expired plain message */}
-        {isExpired && status !== "approved" && status !== "rejected" && (
+        {isExpired && status !== "accepted" && status !== "declined" && (
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
                 <Clock className="size-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-sm text-foreground">
-                  This quote has expired.
-                </h3>
+                <h3 className="font-semibold text-sm text-foreground">This quote has expired.</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Please contact us to request an updated quote.
                 </p>
@@ -396,7 +396,7 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
           </div>
         )}
 
-        {/* Scope Card */}
+        {/* Scope of Work Section (if present) */}
         {quote?.scope && (
           <Card className="border-border bg-card shadow-xs">
             <CardHeader className="pb-3 border-b border-border/60">
@@ -450,7 +450,7 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
                       const line = q * price;
 
                       return (
-                        <TableRow key={item.id ?? idx} className="border-b border-border hover:bg-muted/10">
+                        <TableRow key={idx} className="border-b border-border hover:bg-muted/10">
                           <TableCell className="text-center font-mono text-xs text-muted-foreground py-3">
                             {idx + 1}
                           </TableCell>
@@ -476,42 +476,55 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
           </CardContent>
         </Card>
 
-        {/* Total Summary Card */}
-        <Card className="border-border bg-card shadow-xs">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-xs uppercase font-semibold text-muted-foreground tracking-wider block">
-                  Total Investment
-                </span>
-                <p className="text-xs text-muted-foreground">
-                  Includes all deliverables, milestones, and testing specified above.
-                </p>
-              </div>
-              <div className="text-left sm:text-right">
-                <span className="font-mono text-2xl sm:text-3xl font-extrabold text-foreground block">
-                  {formatMoney(total, currency)}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Totals & Terms Summary Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          {/* Terms Card (if present) */}
+          {quote?.terms ? (
+            <Card className="border-border bg-card shadow-xs">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold">Terms &amp; Conditions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xs sm:text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                  {quote.terms}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div />
+          )}
 
-        {/* Customer Comment Display if already submitted */}
-        {quote?.customer_comment && (
+          {/* Financial Summary Card: Subtotal, Tax, Total */}
           <Card className="border-border bg-card shadow-xs">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Submitted Comment
-              </CardTitle>
+              <CardTitle className="text-sm font-semibold">Financial Summary</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-xs sm:text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                {quote.customer_comment}
-              </p>
+            <CardContent className="space-y-3">
+              <div className="space-y-2 text-xs sm:text-sm divide-y divide-border/60">
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-mono font-medium text-foreground">
+                    {formatMoney(subtotal, currency)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center pt-2.5">
+                  <span className="text-muted-foreground">Tax ({taxPercent}%)</span>
+                  <span className="font-mono font-medium text-foreground">
+                    {formatMoney(taxAmount, currency)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center pt-3 text-base">
+                  <span className="font-bold text-foreground">Total</span>
+                  <span className="font-mono text-lg font-extrabold text-foreground">
+                    {formatMoney(total, currency)}
+                  </span>
+                </div>
+              </div>
             </CardContent>
           </Card>
-        )}
+        </div>
 
         {/* Approval / Rejection Action Panel (Only if status is 'sent' and not expired) */}
         {canRespond && (
@@ -521,28 +534,29 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
                 Quote Approval &amp; Decision
               </CardTitle>
               <CardDescription className="text-xs">
-                Approve or reject this quote. You may optionally include a comment or scheduling note.
+                Approve or reject this quote. You may optionally include a note or scheduling
+                comment.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
-              {/* Optional Comment Textarea (max 1000 characters) */}
+              {/* Optional Note Textarea (max 1000 characters) */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label
-                    htmlFor="decision-comment"
+                    htmlFor="decision-note"
                     className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block"
                   >
-                    Optional Comment (max 1000 characters)
+                    Optional Note (max 1000 characters)
                   </label>
                   <span className="text-[11px] font-mono text-muted-foreground">
-                    {comment.length}/1000
+                    {note.length}/1000
                   </span>
                 </div>
                 <Textarea
-                  id="decision-comment"
-                  value={comment}
+                  id="decision-note"
+                  value={note}
                   maxLength={1000}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={(e) => setNote(e.target.value)}
                   placeholder="Add any specific requirements, kickoff availability, or feedback..."
                   rows={3}
                   className="text-xs leading-relaxed resize-y"
@@ -561,21 +575,21 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
                       className="border-destructive/30 text-destructive hover:bg-destructive/10 text-xs h-9 gap-1.5"
                     >
                       <XCircle className="size-4" />
-                      <span>Reject quote</span>
+                      <span>Reject</span>
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Reject this quote?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to reject this quote? You may provide feedback in the
-                        optional comment.
+                        Are you sure you want to reject quote {quoteNumber}? You may provide
+                        feedback in the optional note.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => void handleDecision("rejected")}
+                        onClick={() => void handleDecision("declined")}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         Confirm Rejection
@@ -597,21 +611,22 @@ export function QuoteApproval({ token }: QuoteApprovalProps) {
                       ) : (
                         <CheckCircle2 className="size-4" />
                       )}
-                      <span>Approve quote</span>
+                      <span>Approve</span>
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Approve this quote?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        By approving this quote, you confirm your acceptance of the deliverables,
-                        timeline, and total. Nexora Technologies will proceed with project onboarding.
+                        By approving quote {quoteNumber}, you confirm your acceptance of the
+                        deliverables, timeline, and total. Nexora Technologies will proceed with
+                        project onboarding.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => void handleDecision("approved")}
+                        onClick={() => void handleDecision("accepted")}
                         className="bg-brand-gradient text-white"
                       >
                         Confirm Approval

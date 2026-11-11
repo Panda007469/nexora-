@@ -235,6 +235,7 @@ export interface TeamMember {
   role: string;
   skills: string[];
   photo?: string;
+  published?: boolean;
 }
 
 export const team: TeamMember[] = [
@@ -243,17 +244,20 @@ export const team: TeamMember[] = [
     role: "Hardware & Embedded Lead",
     skills: ["Circuit design", "Arduino", "ESP32"],
     photo: "/images/team/arjun-kumar.webp",
+    published: false,
   },
   {
     name: "Priya Sharma",
     role: "Front-End Developer",
     skills: ["React", "TypeScript", "UI/UX"],
     photo: "/images/team/priya-sharma.webp",
+    published: false,
   },
   {
     name: "Rahul Verma",
     role: "Embedded Developer & Student Mentor",
     skills: ["C/C++", "IoT", "Mentoring"],
     photo: "/images/team/rahul-verma.webp",
+    published: false,
   },
 ];

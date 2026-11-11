@@ -37,4 +37,3 @@ export function RequireRole({ role, children }: RequireRoleProps) {
 
   return <>{children}</>;
 }
-

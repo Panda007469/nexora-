@@ -33,7 +33,7 @@ export function InitialsAvatar({ name, photo, size = "md", className = "" }: Ini
         className={`relative flex items-center justify-center rounded-full bg-navy text-white font-heading overflow-hidden ${sizeStyles}`}
       >
         <span>{initials}</span>
-        {photo && !imageError && (
+        {Boolean(photo?.trim()) && !imageError && (
           <img
             src={photo}
             alt={name}
